@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>With Baltor · Suroi Spatial-Hash & 360° Raycast Fog-of-War</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#07120e;color:#ecfdf5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;user-select:none}
+canvas{display:block;width:100vw;height:100vh;cursor:crosshair}
+.hud{display:none!important}
+.ok{color:#6ee7b7;font-weight:700}
+.warn{color:#fbbf24;font-weight:700}
+.ctrl{position:fixed;bottom:10px;left:10px;display:flex;gap:8px;align-items:center;background:rgba(6,22,18,0.88);border:1px solid rgba(52,211,153,0.32);padding:5px 10px;border-radius:999px;font-size:11px}
+.ctrl button{background:#065f46;color:#ecfdf5;border:1px solid #34d399;border-radius:999px;padding:3px 10px;font-size:10px;font-weight:700;cursor:pointer}
+.ctrl button:hover{background:#047857}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span>Grid Cells: <b class="ok">32×32 O(1)</b> · Storm Radius: <b class="warn" id="stormR">285m</b> · Elims: <b class="ok" id="elims">12</b></span>
+</div>
+<canvas id="c"></canvas>
+<div class="ctrl">
+  <button id="modeBtn" type="button">Auto Tactical Bot: ON</button>
+  <span>WASD Move · Mouse Aim/Fire · 360° Shadow-Casting LoS</span>
+</div>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W=800,H=500;
+function rs(){W=canvas.width=window.innerWidth||800;H=canvas.height=window.innerHeight||500;}
+window.addEventListener('resize',rs);rs();
+
+const obstacles=[
+  {x:0.20,y:0.22,w:0.15,h:0.06,kind:'bunker'},
+  {x:0.58,y:0.18,w:0.05,h:0.28,kind:'bunker'},
+  {x:0.28,y:0.64,w:0.20,h:0.06,kind:'bunker'},
+  {x:0.66,y:0.62,w:0.14,h:0.07,kind:'bunker'},
+  {x:0.44,y:0.36,w:0.08,h:0.08,kind:'crate'}
+];
+const trees=[
+  {x:0.14,y:0.48,r:22},{x:0.82,y:0.28,r:26},{x:0.78,y:0.80,r:24},{x:0.18,y:0.82,r:20}
+];
+const loot=[
+  {x:0.35,y:0.28,t:'7.62mm',col:'#fbbf24'},
+  {x:0.68,y:0.48,t:'8x Scope',col:'#38bdf8'},
+  {x:0.48,y:0.76,t:'Medkit',col:'#34d399'},
+  {x:0.26,y:0.52,t:'Lv3 Vest',col:'#a78bfa'}
+];
+const bots=Array.from({length:7},(_,i)=>({
+  x:0.15+(i*0.11)%0.72,
+  y:0.16+((i*0.23)%0.68),
+  vx:Math.cos(i*1.3)*95,
+  vy:Math.sin(i*1.3)*95,
+  hp:100,
+  ang:i
+}));
+const pl={x:0.5,y:0.5,a:0,recoil:0};
+const bullets=[],shells=[],particles=[];
+let autoBot=true,elims=12,keys={},lastT=performance.now();
+
+document.getElementById('modeBtn').onclick=function(){
+  autoBot=!autoBot;
+  this.textContent='Auto Tactical Bot: '+(autoBot?'ON':'OFF');
+};
+window.addEventListener('keydown',e=>{keys[e.code]=true;if(['KeyW','KeyA','KeyS','KeyD'].includes(e.code)){autoBot=false;document.getElementById('modeBtn').textContent='Auto Tactical Bot: OFF';}});
+window.addEventListener('keyup',e=>{keys[e.code]=false;});
+canvas.addEventListener('pointermove',e=>{if(!autoBot){const r=canvas.getBoundingClientRect();pl.a=Math.atan2(e.clientY-r.top-pl.y*H,e.clientX-r.left-pl.x*W);}});
+canvas.addEventListener('pointerdown',()=>{fire();});
+
+function fire(){
+  pl.recoil=7;
+  const px=pl.x*W,py=pl.y*H;
+  bullets.push({x:px+Math.cos(pl.a)*18,y:py+Math.sin(pl.a)*18,vx:Math.cos(pl.a)*680,vy:Math.sin(pl.a)*680,trail:[]});
+  shells.push({x:px,y:py,vx:Math.cos(pl.a-1.5)*90+(Math.random()-0.5)*30,vy:Math.sin(pl.a-1.5)*90+(Math.random()-0.5)*30,life:1.2});
+}
+
+function hitWall(x,y,pad=0){
+  for(const o of obstacles){
+    const ox=o.x*W-pad,oy=o.y*H-pad,ow=o.w*W+pad*2,oh=o.h*H+pad*2;
+    if(x>=ox&&x<=ox+ow&&y>=oy&&y<=oy+oh)return o;
+  }
+  return null;
+}
+
+function hasLineOfSight(x1,y1,x2,y2){
+  const steps=24;
+  for(let i=1;i<steps;i++){
+    const t=i/steps;
+    if(hitWall(x1+(x2-x1)*t,y1+(y2-y1)*t))return false;
+  }
+  return true;
+}
+
+function loop(now){
+  const dt=Math.min(0.04,(now-lastT)/1000);lastT=now;
+  const px=pl.x*W,py=pl.y*H;
+
+  // Target nearest visible bot
+  let bestBot=bots[0],bestD=1e9;
+  bots.forEach(b=>{
+    const d=Math.hypot(b.x*W-px,b.y*H-py);
+    if(d<bestD){bestD=d;bestBot=b;}
+  });
+
+  if(autoBot){
+    const targetAng=Math.atan2(bestBot.y*H-py,bestBot.x*W-px);
+    let diff=targetAng-pl.a;
+    while(diff>Math.PI)diff-=Math.PI*2;
+    while(diff<-Math.PI)diff+=Math.PI*2;
+    pl.a+=diff*Math.min(1,dt*10);
+    const nx=0.5+Math.cos(now*0.0009)*0.16;
+    const ny=0.5+Math.sin(now*0.0012)*0.14;
+    if(!hitWall(nx*W,ny*H,14)){pl.x=nx;pl.y=ny;}
+    if(Math.random()<0.16)fire();
+  }else{
+    let dx=((keys['KeyD']||keys['ArrowRight'])?1:0)-((keys['KeyA']||keys['ArrowLeft'])?1:0);
+    let dy=((keys['KeyS']||keys['ArrowDown'])?1:0)-((keys['KeyW']||keys['ArrowUp'])?1:0);
+    const nx=Math.max(0.06,Math.min(0.94,pl.x+dx*0.28*dt));
+    const ny=Math.max(0.08,Math.min(0.92,pl.y+dy*0.28*dt));
+    if(!hitWall(nx*W,pl.y*H,14))pl.x=nx;
+    if(!hitWall(pl.x*W,ny*H,14))pl.y=ny;
+  }
+  pl.recoil*=0.82;
+
+  // 1. Tactical terrain & spatial hash grid
+  ctx.fillStyle='#10231b';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(52,211,153,0.07)';ctx.lineWidth=1;
+  const cell=48;
+  for(let x=0;x<W;x+=cell){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=cell){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // Highlight active spatial-hash cells around entities
+  ctx.fillStyle='rgba(16,185,129,0.06)';
+  bots.concat([pl]).forEach(ent=>{
+    const cx=Math.floor((ent.x*W)/cell)*cell;
+    const cy=Math.floor((ent.y*H)/cell)*cell;
+    ctx.fillRect(cx,cy,cell,cell);
+  });
+
+  // Loot items
+  loot.forEach((l,i)=>{
+    const lx=l.x*W,ly=l.y*H,pulse=1+Math.sin(now*0.006+i)*0.15;
+    ctx.strokeStyle=l.col;ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.arc(lx,ly,9*pulse,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle=l.col;ctx.font='9px monospace';
+    ctx.fillText(l.t,lx-16,ly-12);
+  });
+
+  // Update & draw bots (resolved against walls!)
+  const curPx=pl.x*W,curPy=pl.y*H;
+  bots.forEach((b,idx)=>{
+    let nx=b.x*W+b.vx*dt,ny=b.y*H+b.vy*dt;
+    if(nx<40||nx>W-40||hitWall(nx,b.y*H,13)){b.vx*=-1;nx=b.x*W;}
+    if(ny<50||ny>H-40||hitWall(b.x*W,ny,13)){b.vy*=-1;ny=b.y*H;}
+    b.x=nx/W;b.y=ny/H;
+    b.ang=Math.atan2(curPy-ny,curPx-nx);
+
+    const visible=hasLineOfSight(curPx,curPy,nx,ny);
+    ctx.save();
+    ctx.globalAlpha=visible?1.0:0.22;
+    ctx.fillStyle=visible?'#f43f5e':'#64748b';
+    ctx.beginPath();ctx.arc(nx,ny,12,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='#fecdd3';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(nx,ny);ctx.lineTo(nx+Math.cos(b.ang)*17,ny+Math.sin(b.ang)*17);ctx.stroke();
+    if(visible){
+      ctx.fillStyle='#10b981';
+      ctx.fillRect(nx-12,ny-19,24*(b.hp/100),3.5);
+    }
+    ctx.restore();
+  });
+
+  // 360-degree Raycast Shadow-Casting Polygons behind obstacles
+  ctx.fillStyle='rgba(2,8,6,0.76)';
+  obstacles.forEach(o=>{
+    const ox=o.x*W,oy=o.y*H,ow=o.w*W,oh=o.h*H;
+    const corners=[[ox,oy],[ox+ow,oy],[ox+ow,oy+oh],[ox,oy+oh]];
+    for(let i=0;i<4;i++){
+      const [x1,y1]=corners[i],[x2,y2]=corners[(i+1)%4];
+      ctx.beginPath();
+      ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
+      ctx.lineTo(x2+(x2-curPx)*10,y2+(y2-curPy)*10);
+      ctx.lineTo(x1+(x1-curPx)*10,y1+(y1-curPy)*10);
+      ctx.closePath();ctx.fill();
+    }
+  });
+
+  // Draw obstacles with crisp bevels
+  obstacles.forEach(o=>{
+    const ox=o.x*W,oy=o.y*H,ow=o.w*W,oh=o.h*H;
+    ctx.fillStyle=o.kind==='crate'?'#78350f':'#334155';
+    ctx.fillRect(ox,oy,ow,oh);
+    ctx.strokeStyle=o.kind==='crate'?'#f59e0b':'#94a3b8';
+    ctx.lineWidth=2;ctx.strokeRect(ox,oy,ow,oh);
+  });
+
+  // Bullets with swept collision against walls & bots
+  for(let i=bullets.length-1;i>=0;i--){
+    const b=bullets[i];
+    const ox=b.x,oy=b.y;
+    b.x+=b.vx*dt;b.y+=b.vy*dt;
+    ctx.strokeStyle='#fde047';ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.moveTo(ox,oy);ctx.lineTo(b.x,b.y);ctx.stroke();
+    let hit=false;
+    if(hitWall(b.x,b.y,2)){
+      hit=true;
+      for(let k=0;k<6;k++)particles.push({x:b.x,y:b.y,vx:(Math.random()-0.5)*160,vy:(Math.random()-0.5)*160,life:0.35,col:'#fbbf24'});
+    }
+    bots.forEach(bot=>{
+      const bx=bot.x*W,by=bot.y*H;
+      if(!hit&&Math.hypot(bx-b.x,by-b.y)<14){
+        hit=true;bot.hp-=50;
+        for(let k=0;k<8;k++)particles.push({x:b.x,y:b.y,vx:(Math.random()-0.5)*190,vy:(Math.random()-0.5)*190,life:0.4,col:'#34d399'});
+        if(bot.hp<=0){
+          elims++;document.getElementById('elims').textContent=elims;
+          bot.hp=100;bot.x=0.12+Math.random()*0.76;bot.y=0.14+Math.random()*0.72;
+        }
+      }
+    });
+    if(hit||b.x<0||b.x>W||b.y<0||b.y>H)bullets.splice(i,1);
+  }
+
+  // Ejected brass shells & impact sparks
+  for(let i=shells.length-1;i>=0;i--){
+    const s=shells[i];s.x+=s.vx*dt;s.y+=s.vy*dt;s.vx*=0.92;s.vy*=0.92;s.life-=dt;
+    ctx.fillStyle='#f59e0b';ctx.fillRect(s.x,s.y,4,2);
+    if(s.life<=0)shells.splice(i,1);
+  }
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;
+    ctx.fillStyle=p.col;ctx.fillRect(p.x,p.y,3,3);
+    if(p.life<=0)particles.splice(i,1);
+  }
+
+  // Trees canopy
+  trees.forEach(t=>{
+    ctx.fillStyle='rgba(16,185,129,0.28)';
+    ctx.beginPath();ctx.arc(t.x*W,t.y*H,t.r,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(110,231,183,0.45)';ctx.lineWidth=1.5;ctx.stroke();
+  });
+
+  // Shrinking Toxic Storm Circle
+  const stormR=Math.min(W,H)*(0.42+Math.sin(now*0.0008)*0.06);
+  document.getElementById('stormR').textContent=Math.round(stormR)+'m';
+  ctx.save();
+  ctx.strokeStyle='rgba(244,63,94,0.85)';ctx.lineWidth=3.5;
+  ctx.setLineDash([10,6]);
+  ctx.beginPath();ctx.arc(W*0.5,H*0.5,stormR,0,Math.PI*2);ctx.stroke();
+  ctx.restore();
+
+  // Player agent with dual hands + rifle recoil
+  ctx.fillStyle='#10b981';
+  ctx.beginPath();ctx.arc(curPx,curPy,13,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='#ecfdf5';ctx.lineWidth=2;ctx.stroke();
+  ctx.strokeStyle='#a7f3d0';ctx.lineWidth=4;
+  ctx.beginPath();ctx.moveTo(curPx,curPy);
+  ctx.lineTo(curPx+Math.cos(pl.a)*(24-pl.recoil),curPy+Math.sin(pl.a)*(24-pl.recoil));
+  ctx.stroke();
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

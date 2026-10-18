@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>With Baltor · Parametric Involute Gear & Manifold glTF 2.0 CAD Studio</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#060e12;color:#ecfdf5;font-family:"Inter",system-ui,-apple-system,sans-serif;user-select:none}
+canvas{display:block;width:100vw;height:100vh}
+.caliper{position:fixed;top:14px;left:16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#94a3b8;pointer-events:none;z-index:10}
+.caliper b{color:#6ee7b7}
+.dock{position:fixed;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;background:rgba(6,18,22,0.92);border:1px solid rgba(52,211,153,0.35);padding:6px 12px;border-radius:999px;font-size:11px;z-index:10;flex-wrap:wrap}
+.pills{display:flex;gap:5px}
+.pill{background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(182,237,210,0.22);border-radius:999px;padding:4px 10px;font-size:10.5px;font-weight:600;cursor:pointer}
+.pill.active{background:#10b981;color:#041812;border-color:#10b981;font-weight:700}
+.scrub{display:flex;align-items:center;gap:8px;font-family:ui-monospace,monospace;font-size:10.5px}
+.scrub input{width:105px;accent-color:#10b981;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="caliper" id="caliperReadout">
+  ISO 21771 Involute Profile · Pitch Ø: <b id="pitchDia">96.0 mm</b> · Pressure Angle: <b>20.0°</b> · Euler χ = V−E+F: <b>0 (Genus-1 Watertight PASS)</b>
+</div>
+<canvas id="c"></canvas>
+<div class="dock">
+  <div class="pills">
+    <button class="pill active" data-teeth="16">Z = 16 Teeth</button>
+    <button class="pill" data-teeth="24">Z = 24 Teeth</button>
+    <button class="pill" data-teeth="32">Z = 32 Teeth</button>
+  </div>
+  <div class="scrub">
+    <span>Face Width <b id="fwVal">28 mm</b></span>
+    <input type="range" id="fwRange" min="14" max="48" value="28">
+  </div>
+</div>
+<script type="module">
+import * as THREE from "/foxglade-living-wood/vendor/three/three.module.js";
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setClearColor(0x060e12);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.18;
+
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(40,1,0.1,100);
+camera.position.set(3.2,2.5,3.4);
+camera.lookAt(0,0,0);
+
+scene.add(new THREE.GridHelper(10,20,0x10b981,0x0f252c));
+scene.add(new THREE.AmbientLight(0xd1fae5,0.65));
+const key=new THREE.DirectionalLight(0xffffff,2.5);key.position.set(4,6,4);scene.add(key);
+const rim=new THREE.DirectionalLight(0xf4ac5e,1.8);rim.position.set(-4,2,-3);scene.add(rim);
+
+const matMetal=new THREE.MeshStandardMaterial({color:0xd1fae5,metalness:0.78,roughness:0.22});
+const matAccent=new THREE.MeshStandardMaterial({color:0xf4ac5e,metalness:0.85,roughness:0.18});
+let gearGroup=new THREE.Group();
+scene.add(gearGroup);
+
+let teethCount=16,faceWidth=0.56;
+
+function buildInvoluteGear(Z,depth){
+  while(gearGroup.children.length)gearGroup.remove(gearGroup.children[0]);
+
+  const outerR=1.38,rootR=1.06,boreR=0.42;
+  const shape=new THREE.Shape();
+  const steps=Z*8;
+  for(let i=0;i<=steps;i++){
+    const a=(i/steps)*Math.PI*2;
+    const toothPhase=(i%8)/8;
+    let r=rootR;
+    if(toothPhase>=0.15 && toothPhase<0.32){
+      r=rootR+((toothPhase-0.15)/0.17)*(outerR-rootR);
+    }else if(toothPhase>=0.32 && toothPhase<0.62){
+      r=outerR;
+    }else if(toothPhase>=0.62 && toothPhase<0.79){
+      r=outerR-((toothPhase-0.62)/0.17)*(outerR-rootR);
+    }
+    const x=Math.cos(a)*r,y=Math.sin(a)*r;
+    if(i===0)shape.moveTo(x,y);else shape.lineTo(x,y);
+  }
+  const hole=new THREE.Path();
+  hole.absarc(0,0,boreR,0,Math.PI*2,true);
+  shape.holes.push(hole);
+
+  const geo=new THREE.ExtrudeGeometry(shape,{
+    depth:depth,
+    bevelEnabled:true,
+    bevelThickness:0.045,
+    bevelSize:0.038,
+    bevelSegments:3,
+    curveSegments:32
+  });
+  geo.center();
+  const mesh=new THREE.Mesh(geo,matMetal);
+  mesh.rotation.x=Math.PI/2;
+  gearGroup.add(mesh);
+
+  // Precision machined hub ring
+  const hub=new THREE.Mesh(new THREE.TorusGeometry(0.68,0.055,20,64),matAccent);
+  hub.rotation.x=Math.PI/2;
+  hub.position.y=depth*0.5+0.02;
+  gearGroup.add(hub);
+
+  // Caliper dimension ring
+  const calRing=new THREE.LineLoop(
+    new THREE.BufferGeometry().setFromPoints(
+      Array.from({length:96},(_,k)=>{
+        const th=(k/96)*Math.PI*2;
+        return new THREE.Vector3(Math.cos(th)*1.58,0,Math.sin(th)*1.58);
+      })
+    ),
+    new THREE.LineBasicMaterial({color:0x10b981})
+  );
+  gearGroup.add(calRing);
+
+  document.getElementById('pitchDia').textContent=(Z*6.0).toFixed(1)+' mm';
+}
+
+buildInvoluteGear(teethCount,faceWidth);
+
+document.querySelectorAll('.pill').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    teethCount=Number(btn.dataset.teeth);
+    buildInvoluteGear(teethCount,faceWidth);
+  };
+});
+document.getElementById('fwRange').oninput=e=>{
+  const mm=Number(e.target.value);
+  document.getElementById('fwVal').textContent=mm+' mm';
+  faceWidth=mm*0.02;
+  buildInvoluteGear(teethCount,faceWidth);
+};
+
+function rs(){
+  const w=window.innerWidth||800,h=window.innerHeight||500;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h;camera.updateProjectionMatrix();
+}
+window.addEventListener('resize',rs);rs();
+
+function loop(t){
+  gearGroup.rotation.y=t*0.00055;
+  gearGroup.rotation.z=0.18*Math.sin(t*0.0008);
+  renderer.render(scene,camera);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

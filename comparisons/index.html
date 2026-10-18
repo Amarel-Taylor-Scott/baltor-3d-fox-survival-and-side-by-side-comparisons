@@ -1,0 +1,1195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Baltor Comparisons · Side-by-Side Visual & Playable Studio (compare.baltor.ai)</title>
+  <link rel="canonical" href="https://compare.baltor.ai/" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #081114;
+      color: #eef5f3;
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: 34px 44px minmax(0, 1fr);
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    /* Row 1: Canonical 5-Subdomain Top Bar */
+    .ecosystem-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      background: #050b0d;
+      border-bottom: 1px solid rgba(182, 237, 210, 0.12);
+      font-size: 11px;
+      z-index: 40;
+    }
+    .eco-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #f8fafc;
+    }
+    .eco-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #10b981;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+    }
+    .eco-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .eco-link { white-space: nowrap;
+      color: #94a3b8;
+      text-decoration: none;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-weight: 600;
+      transition: all 0.14s ease;
+    }
+    .eco-link:hover {
+      color: #f8fafc;
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .eco-link.active {
+      color: #062019;
+      background: #6ee7b7;
+      font-weight: 700;
+    }
+    .eco-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ctrl-pill {
+      background: rgba(255, 255, 255, 0.06);
+      color: #cbd5e1;
+      border: 1px solid rgba(182, 237, 210, 0.2);
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .ctrl-pill:hover { background: rgba(182, 237, 210, 0.14); color: #fff; }
+    .ctrl-pill.active {
+      background: #f4ac5e;
+      color: #0f172a;
+      border-color: #f4ac5e;
+      font-weight: 700;
+    }
+
+    /* Row 2: 10-Tab Comparison Switcher Bar */
+    .tab-bar {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0 12px;
+      background: rgba(9, 20, 23, 0.96);
+      border-bottom: 1px solid rgba(182, 237, 210, 0.16);
+      overflow-x: auto;
+      scrollbar-width: none;
+      z-index: 35;
+    }
+    .dir-btn {
+      background: rgba(244, 172, 94, 0.14);
+      color: #f4ac5e;
+      border: 1px solid rgba(244, 172, 94, 0.42);
+      border-radius: 999px;
+      padding: 5px 11px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .dir-btn.active {
+      background: #f4ac5e;
+      color: #0f172a;
+    }
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.045);
+      color: #c7dad5;
+      border: 1px solid rgba(182, 237, 210, 0.15);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.14s ease;
+      flex-shrink: 0;
+    }
+    .tab-btn:hover {
+      background: rgba(182, 237, 210, 0.12);
+      color: #ffffff;
+    }
+    .tab-btn.active {
+      background: #b6edd2;
+      color: #0b2223;
+      border-color: #b6edd2;
+      font-weight: 700;
+      box-shadow: 0 3px 12px rgba(182, 237, 210, 0.22);
+    }
+
+    /* Row 3: Stage */
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #081114;
+    }
+    .split-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      width: 100%;
+      height: 100%;
+      gap: 2px;
+      background: rgba(182, 237, 210, 0.18);
+    }
+    .pane {
+      position: relative;
+      display: grid;
+      grid-template-rows: 30px minmax(0, 1fr);
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      overflow: hidden;
+      background: #081114;
+    }
+    /* Exact 30px top strip */
+    .pane-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      height: 30px;
+      padding: 0 12px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      z-index: 20;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .pane-strip.without {
+      background: #1a1115;
+      color: #fca5a5;
+      border-bottom: 1px solid rgba(248, 113, 113, 0.34);
+    }
+    .pane-strip.with {
+      background: #0d2220;
+      color: #b6edd2;
+      border-bottom: 1px solid rgba(182, 237, 210, 0.34);
+    }
+    .pane-strip.blind {
+      background: #141c24;
+      color: #fde68a;
+      border-bottom: 1px solid rgba(253, 230, 138, 0.35);
+    }
+    .strip-left {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      flex-shrink: 0;
+    }
+    .status-dot.red { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.8); }
+    .status-dot.green { background: #10b981; box-shadow: 0 0 8px rgba(16, 185, 129, 0.8); }
+    .strip-sub {
+      font-weight: 500;
+      opacity: 0.88;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .strip-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .code-pill {
+      background: rgba(255, 255, 255, 0.08);
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+    }
+    .code-pill:hover { background: rgba(255, 255, 255, 0.18); }
+    .code-pill.active { background: #f4ac5e; color: #0f172a; border-color: #f4ac5e; }
+    .ext-link {
+      color: #e2e8f0;
+      text-decoration: none;
+      font-size: 10.5px;
+      font-weight: 600;
+      opacity: 0.85;
+    }
+    .ext-link:hover { opacity: 1; text-decoration: underline; }
+
+    .viewport-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .viewport-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+
+    /* Inspectable Code / Contract Overlay inside each pane */
+    .code-drawer {
+      position: absolute;
+      inset: 0;
+      background: rgba(8, 13, 18, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 18px 20px;
+      overflow-y: auto;
+      display: none;
+      z-index: 18;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 11.5px;
+      line-height: 1.55;
+      color: #e2e8f0;
+    }
+    .code-drawer.open { display: block; }
+    .code-drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .code-drawer pre {
+      background: #05080c;
+      border: 1px solid rgba(182, 237, 210, 0.18);
+      border-radius: 8px;
+      padding: 14px;
+      overflow-x: auto;
+      color: #cbd5e1;
+      margin-bottom: 12px;
+    }
+
+    /* Directory Drawer / Overview Overlay (?view=directory) */
+    .directory-overlay {
+      position: absolute;
+      inset: 0;
+      background: #071114;
+      z-index: 30;
+      overflow-y: auto;
+      padding: 18px 36px 28px;
+      display: none;
+    }
+    .directory-overlay.open { display: block; }
+    .dir-container {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+    .dir-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .dir-header h1 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: -0.01em;
+    }
+    .dir-hr {
+      border: 0;
+      border-top: 1px solid rgba(182, 237, 210, 0.22);
+      margin: 10px 0 12px;
+    }
+    .dir-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+      line-height: 1.35;
+    }
+    .dir-table th {
+      text-align: left;
+      padding: 7px 12px;
+      color: #94a3b8;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(182, 237, 210, 0.22);
+    }
+    .dir-table td {
+      padding: 7.5px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      vertical-align: middle;
+    }
+    .dir-table tr:hover td {
+      background: rgba(16, 185, 129, 0.05);
+    }
+    .dir-col-domain {
+      font-weight: 600;
+      color: #f8fafc;
+      white-space: nowrap;
+    }
+    .dir-col-wo {
+      color: #fca5a5;
+    }
+    .dir-col-wi {
+      color: #b6edd2;
+    }
+    .dir-col-open {
+      white-space: nowrap;
+    }
+    .launch-btn {
+      background: #10b981;
+      color: #041812;
+      border: 0;
+      border-radius: 5px;
+      padding: 5px 11px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .launch-btn:hover { background: #34d399; }
+
+    /* Blind A/B Vote Bar */
+    .vote-bar {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 25;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: rgba(10, 22, 26, 0.94);
+      border: 1px solid rgba(244, 172, 94, 0.55);
+      padding: 8px 16px;
+      border-radius: 999px;
+      backdrop-filter: blur(10px);
+      font-size: 12px;
+    }
+    .vote-bar.visible { display: flex; }
+    .vote-btn {
+      background: #f4ac5e;
+      color: #102426;
+      border: 0;
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <!-- Row 1: Clean 5-Subdomain Navigation Bar -->
+    <header class="ecosystem-bar">
+      <div class="eco-brand">
+        <span class="eco-dot"></span>
+        <span>Baltor · Side-by-Side Comparisons</span>
+      </div>
+      <nav class="eco-nav" aria-label="Baltor Subdomain Architecture">
+        <a class="eco-link" href="https://baltor.ai">Baltor</a>
+        <a class="eco-link active" href="https://compare.baltor.ai">Compare</a>
+        <a class="eco-link" href="https://demos.baltor.ai">Demos</a>
+        <a class="eco-link" href="https://assets.baltor.ai">Assets</a>
+        <a class="eco-link" href="https://blog.baltor.ai">Blog</a>
+      </nav>
+      <div class="eco-right">
+        <button class="ctrl-pill" id="blindBtn" type="button">Blind A/B Vote: OFF</button>
+      </div>
+    </header>
+
+    <!-- Row 2: Directory Button + 16 Live Comparison Tabs -->
+    <nav class="tab-bar" aria-label="16 Side-by-Side Visual Comparisons">
+      <button class="dir-btn" id="dirToggleBtn" type="button">Directory</button>
+      <button class="tab-btn active" data-tab="foxglade">Foxglade 3D</button>
+      <button class="tab-btn" data-tab="outpost">Outpost 2D</button>
+      <button class="tab-btn" data-tab="canyon">Canyon 3D</button>
+      <button class="tab-btn" data-tab="motion">Motion</button>
+      <button class="tab-btn" data-tab="advertising">Ad Spot</button>
+      <button class="tab-btn" data-tab="blender">Blender</button>
+      <button class="tab-btn" data-tab="godot">Godot</button>
+      <button class="tab-btn" data-tab="systems">Systems</button>
+      <button class="tab-btn" data-tab="flexible-graph">Graph</button>
+      <button class="tab-btn" data-tab="harness">Harness</button>
+      <button class="tab-btn" data-tab="rules">Rules &amp; Triggers</button>
+      <button class="tab-btn" data-tab="fourier">Fourier</button>
+      <button class="tab-btn" data-tab="finance">Finance</button>
+      <button class="tab-btn" data-tab="shaders">Shaders</button>
+      <button class="tab-btn" data-tab="audio">Audio DSP</button>
+      <button class="tab-btn" data-tab="cad">CAD / glTF</button>
+    </nav>
+
+    <!-- Row 3: 50/50 Live Split Stage + Directory Drawer -->
+    <main class="stage">
+      <div class="split-grid" id="splitGrid">
+        <!-- LEFT PANE: WITHOUT BALTOR (#1a1115) -->
+        <section class="pane" aria-label="Without Baltor Baseline Viewport">
+          <div class="pane-strip without" id="leftStrip">
+            <div class="strip-left">
+              <span class="status-dot red" id="leftDot"></span>
+              <span id="leftHead">WITHOUT BALTOR</span>
+              <span class="strip-sub" id="leftSub">· Single-Shot LLM Three.js Box Primitives on Flat Plane</span>
+            </div>
+            <div class="strip-actions">
+              <button class="code-pill" id="leftCodeBtn" type="button">[See Code]</button>
+              <a class="ext-link" id="leftFullLink" href="/foxglade-living-wood/without-baltor.html" target="_blank" rel="noopener">↗</a>
+            </div>
+          </div>
+          <div class="viewport-wrap">
+            <iframe id="leftFrame" src="/foxglade-living-wood/without-baltor.html" title="Without Baltor Viewport" allow="autoplay; fullscreen"></iframe>
+            <div class="code-drawer" id="leftDrawer">
+              <div class="code-drawer-head">
+                <strong style="color:#fca5a5" id="leftDrawerTitle">One-Shot Prompt Output (Without Baltor)</strong>
+                <button class="code-pill" onclick="toggleCode('left', false)">Close ✕</button>
+              </div>
+              <pre id="leftDrawerCode"></pre>
+              <div id="leftDrawerNotes" style="color:#fca5a5;font-size:11px;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- RIGHT PANE: WITH BALTOR (#0d2220) -->
+        <section class="pane" aria-label="With Baltor Qualified Viewport">
+          <div class="pane-strip with" id="rightStrip">
+            <div class="strip-left">
+              <span class="status-dot green" id="rightDot"></span>
+              <span id="rightHead">WITH BALTOR</span>
+              <span class="strip-sub" id="rightSub">· 49-Bone Foxglade Living Wood + Foliage Shaders + Pip AI</span>
+            </div>
+            <div class="strip-actions">
+              <button class="code-pill" id="rightCodeBtn" type="button">[See Code]</button>
+              <a class="ext-link" id="rightFullLink" href="https://demos.baltor.ai/foxglade?demo=1" target="_blank" rel="noopener">Open Demo ↗</a>
+            </div>
+          </div>
+          <div class="viewport-wrap">
+            <iframe id="rightFrame" src="/foxglade-living-wood/index.html?demo=1&embed=1" title="With Baltor Viewport" allow="autoplay; fullscreen"></iframe>
+            <div class="code-drawer" id="rightDrawer">
+              <div class="code-drawer-head">
+                <strong style="color:#6ee7b7" id="rightDrawerTitle">Baltor Contract Card + Engine Slot + Verifier</strong>
+                <button class="code-pill" onclick="toggleCode('right', false)">Close ✕</button>
+              </div>
+              <pre id="rightDrawerCode"></pre>
+              <div id="rightDrawerNotes" style="color:#6ee7b7;font-size:11px;"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Directory of All 11 Comparisons (?view=directory) -->
+      <section class="directory-overlay" id="dirOverlay" aria-label="Side-by-Side Comparisons Directory">
+        <div class="dir-container">
+          <div class="dir-header">
+            <h1>Side-by-Side Comparisons</h1>
+            <button class="launch-btn" onclick="setDirectoryOpen(false)">Back to 50/50 View ✕</button>
+          </div>
+          <hr class="dir-hr">
+          <table class="dir-table">
+            <thead>
+              <tr>
+                <th>Domain</th>
+                <th>Without Baltor</th>
+                <th>With Baltor</th>
+                <th>Open</th>
+              </tr>
+            </thead>
+            <tbody id="dirTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Blind A/B Vote Bar -->
+      <div class="vote-bar" id="voteBar">
+        <span id="votePrompt">Blind A/B Active — Compare both live viewports and vote which build is superior:</span>
+        <button class="vote-btn" id="voteA" type="button">Vote Build A (Left)</button>
+        <button class="vote-btn" id="voteB" type="button">Vote Build B (Right)</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const TABS = {
+      "foxglade": {
+        num: "01",
+        category: "3D WebGL2 Game",
+        dirDomain: "3D Foxglade Game",
+        dirWithout: "Box primitives sliding on a flat brown plane.",
+        dirWith: "49-bone rigged fox, foliage shaders, and autonomous companion.",
+        slug: "/games",
+        title: "3D Game: Foxglade · The Living Wood",
+        slot: "threejs_skeletal_world_and_companion_slot",
+        leftSub: "Single-Shot LLM Three.js Box Primitives on Flat Brown Plane",
+        rightSub: "49-Bone Foxglade Forest, Custom Foliage Shaders & Autonomous Patrol",
+        leftUrl: "/foxglade-living-wood/without-baltor.html?mode=fox",
+        rightUrl: "/foxglade-living-wood/index.html?demo=1&embed=1",
+        demoUrl: "https://demos.baltor.ai/foxglade?demo=1",
+        leftCode: `// One-Shot LLM Output: 5 BoxGeometry primitives sliding on a flat plane
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshLambertMaterial({ color: 0x6b4c35 }));
+const body = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.65, 1.65), orangeMat);
+const head = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.6, 0.65), orangeMat);
+// No skeletal rig, no heightmap, rigid sine-wave leg swing:
+legs[0].rotation.x = Math.sin(time * 10) * 0.45;`,
+        leftNotes: "Failure Mode: Regenerates primitive boxes from scratch; zero skeletal hierarchy, zero terrain heightmap clearance, and flat Lambert lighting.",
+        rightCode: `# Baltor Contract Card & Engine Slot: threejs_skeletal_world_and_companion_slot
+slot_id: threejs_skeletal_world_and_companion_slot
+typed_edge: WorldStepRequestV1 -> WorldStepSnapshotV1 (FIXED_DT = 1/60s)
+qualified_assets:
+  - assets/mesh2motion/fox-rig-49-bones.glb (CC0 Verified, 49 joints)
+  - world.mjs: 2,400 wind-swaying grass blades + Fresnel ripple pond + catenary bridge
+  - companion.mjs: Pip utility-AI pathfinding & shrine guidance
+verifier_gate: cameraClearance() >= 1.8m && drawCalls <= 120 && welcomeOverlayHiddenInDemo == true`,
+        rightNotes: "Verified Benefit: Preserves the 49-bone rigged GLB and custom foliage shaders across revisions while verifying camera clearance and 60 FPS frame budget."
+      },
+      "outpost": {
+        num: "02",
+        category: "2D Top-Down Game",
+        dirDomain: "2D Top-Down Survival",
+        dirWithout: "Overlapping squares and enemies clipping through walls.",
+        dirWith: "Spatial-hash grid, 360° raycast shadows, and storm circle.",
+        slug: "/outpost",
+        title: "2D Game: Top-Down Battle-Royale Survival",
+        slot: "topdown_spatial_hash_and_raycast_los_slot",
+        leftSub: "Overlapping Squares, O(N²) Lag & Enemies Clipping Through Walls",
+        rightSub: "Suroi Spatial-Hash Engine + 360° Raycast Shadow Fog-of-War + Storm",
+        leftUrl: "/comparisons/outpost-without.html",
+        rightUrl: "/comparisons/outpost-with.html",
+        demoUrl: "https://demos.baltor.ai/worlds?mode=survival3d",
+        leftCode: `// One-Shot LLM Output: Naive O(N^2) loop, no wall collision or shadow casting
+for (let i = 0; i < enemies.length; i++) {
+  enemies[i].x += enemies[i].vx * dt; // Clips straight through solid walls!
+  ctx.fillRect(enemies[i].x, enemies[i].y, 24, 24); // Visible through walls!
+}`,
+        leftNotes: "Failure Mode: O(N²) pairwise checks, enemies walk and shoot straight through bunker walls, and players have full wallhack visibility.",
+        rightCode: `# Baltor Contract Card: topdown_spatial_hash_and_raycast_los_slot
+slot_id: topdown_spatial_hash_and_raycast_los_slot
+reference_engine: HasangerGames/suroi + Baltor 32x32 Spatial-Hash Adapter
+capabilities:
+  - 360_degree_shadow_polygon_clipper (occludes enemies behind obstacles)
+  - poisson_disc_loot_spawner (r_min = 28m, weapon/scope/medkit tiers)
+  - shrinking_storm_circle_controller + shell_casing_particle_pool
+verifier_gate: wallClipCount == 0 && broadphaseComplexity == "O(1)"`,
+        rightNotes: "Verified Benefit: Zero wall clipping, real-time 2D shadow-casting fog-of-war behind every bunker, and O(1) spatial-hash broadphase."
+      },
+      "canyon": {
+        num: "03",
+        category: "3D Spline Racing",
+        dirDomain: "3D Canyon Racing",
+        dirWithout: "Flat gray ring where box car slides off.",
+        dirWith: "Banked Catmull-Rom canyon spline with four-wheel spring suspension.",
+        slug: "/canyon",
+        title: "3D Game: Canyon Parkour & Spline Drift",
+        slot: "spline_canyon_vehicle_suspension_slot",
+        leftSub: "Unbanked Flat Gray Ring · Rigid Box Car Clips Off Corners",
+        rightSub: "Catmull-Rom Banked Canyon Spline, 4-Wheel Spring Suspension & Drift",
+        leftUrl: "/comparisons/canyon-without.html",
+        rightUrl: "/comparisons/canyon-with.html",
+        demoUrl: "https://demos.baltor.ai/worlds?mode=race",
+        leftCode: `// One-Shot LLM Output: Flat unbanked RingGeometry + rigid box translation
+const track = new THREE.Mesh(new THREE.RingGeometry(30, 42, 24), grayBasicMat);
+car.position.set(Math.cos(t) * r, 0, Math.sin(t) * r); // Slides off unbanked turns`,
+        leftNotes: "Failure Mode: Zero curve banking, zero wheel suspension raycasts, and flat unlit track geometry.",
+        rightCode: `# Baltor Contract Card: spline_canyon_vehicle_suspension_slot
+slot_id: spline_canyon_vehicle_suspension_slot
+typed_edge: SplineTrackSpecV1 -> BankedRibbonMesh + RaycastVehicleStateV1
+physics_parameters:
+  spline: CatmullRomCurve3(centripetal, closed=true, bank_clamp=25deg)
+  suspension: 4_wheel_spring_damper(k=42000, c=4800)
+  camera_warp: dynamic_fov(72deg..84deg) + drift_ribbon_trail(120_pts)`,
+        rightNotes: "Verified Benefit: Continuous centripetal Catmull-Rom banking keeps high-speed drifts planted on the canyon ribbon with live 4-wheel suspension telemetry."
+      },
+      "motion": {
+        num: "04",
+        category: "Motion Graphics",
+        dirDomain: "Motion Graphics",
+        dirWithout: "Linear CSS opacity fade on static gray text.",
+        dirWith: "RK4 spring typography with 200-circle Fourier epicycle drawing.",
+        slug: "/motion",
+        title: "Motion Graphics & Kinetic Typography Studio",
+        slot: "motion_graphics_kinetic_typography_slot",
+        leftSub: "Linear CSS Opacity 0→1 Text Fade on Flat Gray Background",
+        rightSub: "RK4 Spring Typography (k=280, c=18) + 200-Circle Fourier Epicycles",
+        leftUrl: "/comparisons/motion-without.html",
+        rightUrl: "/comparisons/motion-with.html",
+        demoUrl: "https://demos.baltor.ai/motion",
+        leftCode: `/* One-Shot LLM CSS Output: Robotic linear opacity fade */
+.hero-title {
+  opacity: 0;
+  animation: fadeIn 2.5s linear infinite; /* No spring overshoot or stagger */
+  color: #ffffff;
+}`,
+        leftNotes: "Failure Mode: Robotic linear easing, zero per-glyph stagger kinematics, muddy sRGB interpolation, and static geometry.",
+        rightCode: `# Baltor Contract Card: motion_graphics_kinetic_typography_slot
+slot_id: motion_graphics_kinetic_typography_slot
+engines:
+  - rk4_spring_typography_solver (stiffness=280, damping=18, mass=1.0, stagger=45ms)
+  - fourier_epicycle_harmonic_drawer (N=200 DFT complex harmonics sorted by amplitude)
+  - oklab_perceptual_gradient_pipeline + 64_band_spectrum_analyzer
+verifier_gate: frameRate >= 60 && springSettlingError < 1e-3`,
+        rightNotes: "Verified Benefit: Combines 200-circle complex Fourier epicycle path reconstruction with interactive RK4 spring-physics typography."
+      },
+      "advertising": {
+        num: "05",
+        category: "3D Commercial Spot",
+        dirDomain: "3D Product Spot",
+        dirWithout: "Flat placeholder box with generic marketing buzzwords.",
+        dirWith: "3D titanium turntable, exploded optics, and rim lighting.",
+        slug: "/advertising",
+        title: "Advertising & 3D Product Reveal Studio",
+        slot: "advertising_3d_product_commercial_slot",
+        leftSub: "Flat 2D Placeholder Box + Cheesy AI-Slop Marketing Copy",
+        rightSub: "3D PBR Brushed-Titanium Turntable, Exploded Optics & 4-Beat Rim Sweep",
+        leftUrl: "/comparisons/advertising-without.html",
+        rightUrl: "/comparisons/advertising-with.html",
+        demoUrl: "https://demos.baltor.ai/advertising",
+        leftCode: `<!-- One-Shot LLM Ad Output: Generic 2D card with AI-slop copy -->
+<div class="card">
+  <div class="placeholder">[ 2D Product Image Placeholder ]</div>
+  <h2>Revolutionize Your Future Today!</h2>
+  <p>Unlock seamless next-generation synergy...</p>
+</div>`,
+        leftNotes: "Failure Mode: Cliché AI-slop buzzwords ('Revolutionize', 'Seamless Synergy'), flat 2D placeholder box, and zero camera/lighting choreography.",
+        rightCode: `# Baltor Contract Card: advertising_3d_product_commercial_slot
+slot_id: advertising_3d_product_commercial_slot
+hero_assembly: 7-part explodable Three.js PBR Chrono-Core (Titanium + Sapphire + 24K Gold)
+camera_keyframes:
+  - beat_01: Macro Rim Reveal (explode=0.0, grazing_rim_intensity=5.5)
+  - beat_02: Exploded Optical Internals (z_separation=1.15m)
+  - beat_03: Anisotropic 3-Point Light Sweep
+  - beat_04: Commercial Hero Lockup + Material Switcher`,
+        rightNotes: "Verified Benefit: Broadcast-grade 3D PBR product reveal with synchronized 4-beat camera choreography, exploded optical internals, and humanizer-verified copy."
+      },
+      "blender": {
+        num: "06",
+        category: "Blender 3D & BPY",
+        dirDomain: "Blender 3D & Nodes",
+        dirWithout: "Four un-subdivided gray cubes intersecting at world origin.",
+        dirWith: "Procedural Corinthian fluted relief with watertight manifold check.",
+        slug: "/blender",
+        title: "Blender 3D & Geometry Nodes Viewport",
+        slot: "blender_geometry_nodes_and_pbr_studio_slot",
+        leftSub: "4 Un-Subdivided Gray Cubes/Cylinders Intersecting at (0,0,0)",
+        rightSub: "Corinthian Fluted Relief + Twisted Pavilion + Live Geometry Nodes Graph",
+        leftUrl: "/comparisons/blender-without.html",
+        rightUrl: "/comparisons/blender-with.html",
+        demoUrl: "https://demos.baltor.ai/blender",
+        leftCode: `# One-Shot LLM Blender bpy Script: Blind coordinate guessing at (0,0,0)
+import bpy
+bpy.ops.mesh.primitive_cube_add(location=(0, 0, 0))
+bpy.ops.mesh.primitive_cylinder_add(location=(-0.2, 0.8, -0.1))
+# No subdivision, no Geometry Nodes tree, 28 non-manifold open edges!`,
+        leftNotes: "Failure Mode: Guesses raw vertex/primitive coordinates without spatial awareness or manifold verification, dumping overlapping gray blocks at the origin.",
+        rightCode: `# Baltor Contract Card: blender_geometry_nodes_and_pbr_studio_slot
+slot_id: blender_geometry_nodes_and_pbr_studio_slot
+geometry_nodes_tree:
+  01_curve_circle(res=96, r=1.65m)
+  -> 02_corinthian_fluted_harmonic(flutes=24, entasis=true)
+  -> 03_helical_voronoi_pavilion(twist=1.8rad)
+  -> 04_subdivide_catmull_clark(level=2, shade_smooth=true)
+  -> 05_manifold_verifier(non_manifold_edges == 0)
+viewport_passes: [PBR Studio, MatCap Clay, Normal Map, Manifold Wireframe]`,
+        rightNotes: "Verified Benefit: Procedural Geometry Nodes pipeline with live viewport shading passes and deterministic 0-non-manifold-edge verification."
+      },
+      "godot": {
+        num: "07",
+        category: "Godot 4 Engine",
+        dirDomain: "Godot 4 Physics",
+        dirWithout: "Discrete position step tunnels straight through thin walls.",
+        dirWith: "Swept-AABB collision, coyote timer, and live scene tree.",
+        slug: "/godot",
+        title: "Godot 4 Engine, Swept-AABB & Scene Tree",
+        slot: "godot_scene_tree_and_physics_controller_slot",
+        leftSub: "Single-Script position.x += speed · Tunnels Through Thin Walls",
+        rightSub: "Swept-AABB TOI Collision + 110ms Coyote + FABRIK IK + .tscn Inspector",
+        leftUrl: "/comparisons/godot-without.html",
+        rightUrl: "/comparisons/godot-with.html",
+        demoUrl: "https://demos.baltor.ai/godot",
+        leftCode: `# One-Shot LLM GDScript: Naive discrete step tunnels through thin walls
+func _process(delta):
+    position.x += speed * delta # dx=46px jumps straight past 12px wall!
+    if Input.is_action_just_pressed("jump") and is_on_floor():
+        velocity.y = -400 # Zero coyote time or jump buffer`,
+        leftNotes: "Failure Mode: High-speed movement and projectiles tunnel straight through thin walls; zero coyote time, zero jump buffering, and monolithic script structure.",
+        rightCode: `# Baltor Contract Card: godot_scene_tree_and_physics_controller_slot
+slot_id: godot_scene_tree_and_physics_controller_slot
+scene_tree_hierarchy:
+  Player (CharacterBody2D)
+  ├─ StateMachine (RUN_IK | APEX_FLOAT | DASH)
+  ├─ CoyoteTimer (110ms) & JumpBufferTimer (120ms)
+  ├─ SweptRayCast2D (Continuous Time-of-Impact t in [0,1])
+  └─ FabrikCapeIK (5-bone Verlet + Squash/Stretch Spring)
+verifier_gate: wallTunnelCount == 0 && coyoteWindowMs == 110`,
+        rightNotes: "Verified Benefit: Continuous swept-AABB Time-of-Impact collision stops 100% of high-speed bolts at thin walls, paired with a live Godot .tscn scene-tree inspector."
+      },
+      "systems": {
+        num: "08",
+        category: "Systems Architecture",
+        dirDomain: "Distributed Systems",
+        dirWithout: "Static three-box diagram with single point of failure.",
+        dirWith: "60 FPS packet simulator with hash ring failover.",
+        slug: "/systems",
+        title: "Distributed Systems Architecture Simulator",
+        slot: "distributed_systems_architecture_simulator_slot",
+        leftSub: "Static 3-Box ASCII Diagram · Single Point of Failure · No Backpressure",
+        rightSub: "Live 60 FPS Anycast → Token Bucket → 32-vnode Hash Ring → Raft Shards",
+        leftUrl: "/comparisons/systems-without.html",
+        rightUrl: "/comparisons/systems-with.html",
+        demoUrl: "https://demos.baltor.ai/systems",
+        leftCode: `// One-Shot LLM Systems Output: Static 3-box ASCII diagram
+[Client] ---> [Single Server] ---> [Primary SQL DB]
+// No token-bucket rate limiter, no consistent hashing, no Raft failover math.`,
+        leftNotes: "Failure Mode: Produces static 3-box diagrams with zero capacity math, single point of failure, and cascading 502 timeouts under load.",
+        rightCode: `# Baltor Contract Card: distributed_systems_architecture_simulator_slot
+slot_id: distributed_systems_architecture_simulator_slot
+topology:
+  - edge_anycast_bgp (180k req/s ingress)
+  - token_bucket_admission (burst=5000, load_shedding_circuit_breaker=ON)
+  - consistent_hash_ring (32 virtual nodes, bounded load factor 1.25)
+  - raft_consensus_shards (S1, S2, S3 with automatic follower promotion)
+interactive_chaos_controls: [Spike 10x Traffic, Kill Primary Shard S1, Toggle Circuit Breaker]`,
+        rightNotes: "Verified Benefit: Interactive 60 FPS packet-level simulator with chaos injection, Raft quorum failover, and live p50/p99 latency telemetry."
+      },
+      "flexible-graph": {
+        num: "09",
+        category: "Loop Solution-Graph",
+        dirDomain: "Solution-Graph & Slots",
+        dirWithout: "Brittle linear prompt chain crashes on one error.",
+        dirWith: "Typed Loop graph with hot-swappable engine slots.",
+        slug: "/graphs",
+        title: "System Flexible Solution-Graph & Engine Slots",
+        slot: "loop_engine_flexible_solution_graph_slot",
+        leftSub: "Brittle Linear Prompt Chain · 1 Hallucination Corrupts Entire Run",
+        rightSub: "Loop DAG (Discover→Select→Materialize→Execute→Verify) + Hot-Swap Engines",
+        leftUrl: "/comparisons/flexible-graph-without.html",
+        rightUrl: "/comparisons/flexible-graph-with.html",
+        demoUrl: "https://demos.baltor.ai/graphs",
+        leftCode: `// Without Baltor: Brittle untyped linear prompt chain
+const step1 = await llm("Write 3D scene..."); // Hallucinates non-existent method
+const step2 = await llm("Add physics to: " + step1); // Propagates broken code
+const step3 = eval(step2); // Uncaught TypeError crashes entire pipeline`,
+        leftNotes: "Failure Mode: Untyped string concatenation across prompts with no contract cards, no swappable engine slots, and no preflight/verification gate.",
+        rightCode: `# Baltor Contract Card: loop_engine_flexible_solution_graph_slot
+vertex_runtime: Loop (Practitioner | Intelligence | Solution)
+fixed_typed_edge: ComponentEnvelopeV1 (7-layer preflight + typed input/output)
+swappable_engines (engine_slots.yaml):
+  - engine_a: baltor_native_rust_js_engine (2.1ms)
+  - engine_b: pinned_github_container_adapter (SHA-pinned, sandboxed)
+  - engine_c: ollama_cloud_gemma4_hybrid_engine
+runtime_guarantee: Hot-swap any engine at run time with zero caller edits.`,
+        rightNotes: "Verified Benefit: Every graph vertex is a Loop with a fixed typed edge and hot-swappable engines verified by the 7-layer ComponentEnvelope."
+      },
+      "harness": {
+        num: "10",
+        category: "6-Part Agent Harness",
+        dirDomain: "Agent Harness Guide",
+        dirWithout: "Naked model loop hits context rot at 28%.",
+        dirWith: "Six-part agent harness with progressive contract cards.",
+        slug: "/harness",
+        title: "Better Model or Better Harness? (6-Part Visual Guide)",
+        slot: "six_part_agent_harness_architecture_slot",
+        leftSub: "Naked Model in a While-Loop · 94% Context Rot · 28.4% Ceiling",
+        rightSub: "Interactive 6-Part Harness Anatomy, 4 Eras & Model × Harness Matrix",
+        leftUrl: "/comparisons/harness-without.html",
+        rightUrl: "/harness-guide/index.html",
+        demoUrl: "https://demos.baltor.ai/harness",
+        leftCode: `// Naked Model Loop (Era 1-2): Dumps raw files into prompt window
+while (!task.done) {
+  const reply = await model.generate(fullRepoDump + errorLog);
+  applyUnverifiedPatch(reply); // Context bloats to 94%, score plateaus at 28%
+}`,
+        leftNotes: "Failure Mode: Upgrading model weights inside a naked while-loop hits a hard reliability ceiling due to context rot and unverified effects.",
+        rightCode: `# Baltor 6-Part Agent Harness Architecture
+01_context_routing: Progressive contract cards (load source only when needed)
+02_typed_tool_boundaries: Effect authority & sandboxed execution
+03_swappable_engine_slots: Reuse qualified code & native tools first
+04_deterministic_verifiers: Conformance kits + visual/manifold checks
+05_immutable_memory_records: Content-addressed state & rollback receipts
+06_independent_acceptance: Producer never approves its own work`,
+        rightNotes: "Verified Benefit: Interactive visual guide demonstrating why the 6-part harness drives a +42pt capability lift across both local and frontier models."
+      },
+      "rules": {
+        num: "11",
+        category: "Anti-Slop & Anti-Busy",
+        dirDomain: "Rules & Triggers",
+        dirWithout: "Busy bento card soup, 14 subdomains, slop copy.",
+        dirWith: "16 automated rules enforcing clean tables and viewports.",
+        slug: "/rules",
+        title: "Anti-Slop & Anti-Busy Rule Engine (16 Triggers)",
+        slot: "anti_slop_and_anti_busy_rule_gate_slot",
+        leftSub: "Busy AI-Slop Bento Cards, 14 Subdomains & Stacked HUD Clutter",
+        rightSub: "16 Enforced Rules (R_UI, R_VP, R_PR, R_URL, R_GR) · Clean <hr> + <table>",
+        leftUrl: "/comparisons/rules-without.html",
+        rightUrl: "/comparisons/rules-with.html",
+        demoUrl: "https://compare.baltor.ai/?tab=rules",
+        leftCode: `<!-- Typical Unchecked AI-Slop Page -->
+<div class="bento-grid-3col">
+  <div class="card">
+    <span class="kicker">TAB 01 · CANONICAL NEXT-GEN SYNERGY</span>
+    <code>threejs_skeletal_world_and_companion_slot_v2</code>
+    <h3>Revolutionize Your Seamless Workflow!</h3>
+  </div>
+</div>`,
+        leftNotes: "Failure Mode: Stacked navbars, 14 fragmented subdomains, 3-column bento card grids, internal snake_case slot dumps, and duplicate floating HUD telemetry.",
+        rightCode: `# Baltor 16 Anti-Slop & Anti-Busy Rules (R_UI / R_VP / R_PR / R_URL / R_GR)
+R_UI_01..04: 5 clean nav links, <hr> + <table> directory, <= 10 words/cell, 0 snake_case IDs
+R_VP_01..04: 0 duplicate top HUD boxes, immediate ?demo=1 start, 0 non-manifold edges, 60 FPS
+R_PR_01..04: Block AI buzzwords ("revolutionize", "synergy"), strip "Canonical" & all-caps kickers
+R_URL_01..02: Cap architecture at 5 subdomains (Baltor, Compare, Demos, Assets, Blog) + direct slugs
+R_GR_01..02: Keep contract cards < 2 KB; enforce single Loop vertex runtime & independent review`,
+        rightNotes: "Verified Benefit: Automatically blocks card-grid soup, strips parenthetical nav clutter, removes duplicate viewport HUD pills, and enforces < 2 KB contract cards."
+      },
+      "fourier": {
+        num: "12",
+        category: "Fourier Epicycles",
+        dirDomain: "Fourier Epicycles",
+        dirWithout: "Crooked four-line polygon with unclosed endpoint gap.",
+        dirWith: "200-circle complex DFT epicycle contour and waveform.",
+        slug: "/fourier",
+        title: "200-Circle Complex DFT Epicycle Estimator & Lissajous Visualizer",
+        slot: "complex_dft_epicycle_contour_solver_slot",
+        leftSub: "Crooked 4-Line Static Polygon · Un-Closed Endpoint Gap (48.2% L2 Error)",
+        rightSub: "200-Circle Complex DFT Epicycles (N=2..200) + Synchronized XY Waveform",
+        leftUrl: "/comparisons/fourier-without.html",
+        rightUrl: "/comparisons/fourier-with.html",
+        demoUrl: "https://compare.baltor.ai/?tab=fourier",
+        leftCode: `// One-Shot LLM Output: 4 hardcoded lineTo() calls with un-closed endpoint gap
+ctx.beginPath();
+ctx.moveTo(285, 180);
+ctx.lineTo(525, 155);
+ctx.lineTo(505, 360);
+ctx.lineTo(270, 335); // Leaves 44px open gap, 48.2% L2 error`,
+        leftNotes: "Failure Mode: Guesses 4 static polygon vertices with an un-closed gap and zero harmonic decomposition.",
+        rightCode: `# Baltor Contract Card: complex_dft_epicycle_contour_solver_slot
+slot_id: complex_dft_epicycle_contour_solver_slot
+math_kernel: c_k = (1/M) * sum_{n=0}^{M-1} z_n * exp(-i * 2*pi * k * n / M)
+harmonic_sorting: Amplitude-sorted epicycles (N = 2, 10, 50, 200 circles)
+verifier_gate: contourClosureError == 0.0 && l2ReconstructionError < 0.0005`,
+        rightNotes: "Verified Benefit: Exact closed-contour reconstruction using 200 complex DFT rotating phasors and live harmonic truncation controls."
+      },
+      "finance": {
+        num: "13",
+        category: "Quantitative Finance",
+        dirDomain: "Budget & Fee Math",
+        dirWithout: "Unverified budget bars summing to 134% total.",
+        dirWith: "Balanced Sankey flow and 30-year fee waterfall.",
+        slug: "/finance",
+        title: "Balanced Budget Sankey, (r − g) Debt Boundary & 30-Year Fee Drag",
+        slot: "macro_fiscal_sankey_and_fee_drag_verifier_slot",
+        leftSub: "Unverified LLM Bar Chart Summing to 134% · Ignores Compound Fee Drag",
+        rightSub: "Balanced Sankey (Σ In ≡ Σ Out), (r − g) Debt Plane & 30-Yr Fee Waterfall",
+        leftUrl: "/comparisons/finance-without.html",
+        rightUrl: "/comparisons/finance-with.html",
+        demoUrl: "https://compare.baltor.ai/?tab=finance",
+        leftCode: `// Unverified LLM Budget Output: Shares sum to 134% (violates accounting identity!)
+const budget = { healthcare: "42%", education: "38%", pensions: "31%", infra: "23%" };
+// 42 + 38 + 31 + 23 = 134%! Also treats 1.25% annual fee as flat 1.25% over 30 yrs.`,
+        leftNotes: "Failure Mode: Hallucinates percentages that violate conservation of funds (134% total) and ignores exponential fee compounding.",
+        rightCode: `# Baltor Contract Card: macro_fiscal_sankey_and_fee_drag_verifier_slot
+slot_id: macro_fiscal_sankey_and_fee_drag_verifier_slot
+identities_enforced:
+  - sankey_conservation: sum(Inflows) == sum(Outflows) ($250.0B exact)
+  - debt_dynamics: d_t - d_{t-1} = ((r - g)/(1 + g)) * d_{t-1} + primary_deficit_t
+  - fee_waterfall: W_T(f) = W_0 * (1 + r_gross - f)^T (0.03% vs 1.25% over 30 yrs)`,
+        rightNotes: "Verified Benefit: Enforces strict double-entry flow conservation (Σ Inflows ≡ Σ Outflows) and exact 30-year exponential fee-drag math."
+      },
+      "shaders": {
+        num: "14",
+        category: "WebGL2 SDF Shaders",
+        dirDomain: "GLSL SDF Shaders",
+        dirWithout: "Flat 2D CSS radial-gradient circle on gray.",
+        dirWith: "WebGL2 raymarched SDF metaballs with Fresnel dispersion.",
+        slug: "/shaders",
+        title: "WebGL2 / GLSL Signed-Distance-Field (SDF) Raymarched Boolean Metaballs",
+        slot: "webgl2_sdf_raymarching_and_fresnel_shader_slot",
+        leftSub: "Flat 2D CSS radial-gradient Circle Pretending to Be a 3D Shader",
+        rightSub: "60 FPS WebGL2 GLSL SDF Raymarched Smooth-Min Metaballs + Chromatic IOR",
+        leftUrl: "/comparisons/shaders-without.html",
+        rightUrl: "/comparisons/shaders-with.html",
+        demoUrl: "https://compare.baltor.ai/?tab=shaders",
+        leftCode: `/* One-Shot LLM Output: Flat 2D CSS radial-gradient div */
+.shader-orb {
+  width: 210px; height: 210px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #60a5fa, #1e3a8a);
+}`,
+        leftNotes: "Failure Mode: Substitutes a static 2D CSS gradient circle instead of writing a real WebGL fragment raymarcher.",
+        rightCode: `# Baltor Contract Card: webgl2_sdf_raymarching_and_fresnel_shader_slot
+slot_id: webgl2_sdf_raymarching_and_fresnel_shader_slot
+glsl_kernels:
+  - smooth_minimum: smin(a, b, k) polynomial C1 boolean union
+  - central_diff_normal: normalize(grad(map(p))) with eps = 0.002
+  - optics: Schlick Fresnel rim + iridescent spectral cosine palette`,
+        rightNotes: "Verified Benefit: Real-time 72-step sphere-traced GLSL fragment shader with interactive smooth-minimum blending and surface normal inspection."
+      },
+      "audio": {
+        num: "15",
+        category: "WebAudio & DSP",
+        dirDomain: "WebAudio & FFT",
+        dirWithout: "Un-enveloped square wave with +6.4 dBFS clipping.",
+        dirWith: "Polyphonic FM synthesizer, 64-band FFT, Lissajous scope.",
+        slug: "/audio",
+        title: "Polyphonic ADSR / FM Synthesizer, 64-Band FFT & Stereo Lissajous Scope",
+        slot: "webaudio_polyphonic_fm_and_fft_analyzer_slot",
+        leftSub: "Raw Un-Enveloped Square Oscillator · Nyquist Aliasing · +6.4 dBFS Clip",
+        rightSub: "Band-Limited Polyphonic FM + ADSR Envelope + 64-Band FFT + X-Y Scope",
+        leftUrl: "/comparisons/audio-without.html",
+        rightUrl: "/comparisons/audio-with.html",
+        demoUrl: "https://compare.baltor.ai/?tab=audio",
+        leftCode: `// One-Shot LLM WebAudio Output: Raw square wave with clicks and hard clipping
+const osc = audioCtx.createOscillator();
+osc.type = "square"; // No gain envelope, +6.4 dBFS clipping at output!
+osc.connect(audioCtx.destination);`,
+        leftNotes: "Failure Mode: Connects raw un-attenuated oscillators directly to destination with zero ADSR envelope, causing severe clipping and clicks.",
+        rightCode: `# Baltor Contract Card: webaudio_polyphonic_fm_and_fft_analyzer_slot
+slot_id: webaudio_polyphonic_fm_and_fft_analyzer_slot
+dsp_chain:
+  - polyphonic_fm_carrier_modulator (Fmaj9 / Cm11 / 3:2 Bell harmonic ratios)
+  - adsr_envelope_generator (A=12ms, D=180ms, S=0.65, R=420ms)
+  - lookahead_brickwall_limiter (ceiling = -1.0 dBFS, clipCount == 0)`,
+        rightNotes: "Verified Benefit: Band-limited polyphonic FM synthesis with ADSR envelope protection, 64-band FFT spectrum analyzer, and stereo X-Y vector scope."
+      },
+      "cad": {
+        num: "16",
+        category: "Parametric CAD / glTF",
+        dirDomain: "Parametric CAD / glTF",
+        dirWithout: "Uncapped extrusion with 18 self-intersecting tooth edges.",
+        dirWith: "ISO 21771 involute gear with watertight manifold.",
+        slug: "/cad",
+        title: "Parametric Involute Gear & Manifold glTF 2.0 CAD Extruder",
+        slot: "parametric_involute_cad_and_gltf_manifold_slot",
+        leftSub: "Uncapped Extrusion · Inverted Normals & 18 Self-Intersecting Tooth Edges",
+        rightSub: "ISO 21771 Parametric Involute Gear (Z=16..32) + Watertight Genus-1 Check",
+        leftUrl: "/comparisons/cad-without.html",
+        rightUrl: "/comparisons/cad-with.html",
+        demoUrl: "https://compare.baltor.ai/?tab=cad",
+        leftCode: `// One-Shot LLM CAD Output: Unclosed path extrusion with self-intersecting teeth
+const geo = new THREE.ExtrudeGeometry(unclosedStarPath, { bevelEnabled: false });
+// Missing end-caps, inverted normals, and 18 self-intersecting edges!`,
+        leftNotes: "Failure Mode: Extrudes unclosed self-intersecting 2D paths without bore topology or Euler-Poincaré manifold verification.",
+        rightCode: `# Baltor Contract Card: parametric_involute_cad_and_gltf_manifold_slot
+slot_id: parametric_involute_cad_and_gltf_manifold_slot
+cad_parameters:
+  - standard: ISO 21771 Involute Gear Profile (pressure_angle = 20.0 deg)
+  - teeth_count: interactive Z in {16, 24, 32}, module m = 6.0 mm
+  - manifold_gate: Euler characteristic V - E + F == 0 (Genus-1 watertight PASS)`,
+        rightNotes: "Verified Benefit: Parametric ISO 21771 involute tooth profile with precision central bore, chamfered bevels, and live caliper dimension lines."
+      }
+    };
+
+    const SLUG_TO_TAB = {
+      "/games": "foxglade",
+      "/foxglade": "foxglade",
+      "/fox": "foxglade",
+      "/outpost": "outpost",
+      "/survival": "outpost",
+      "/canyon": "canyon",
+      "/race": "canyon",
+      "/motion": "motion",
+      "/advertising": "advertising",
+      "/ads": "advertising",
+      "/blender": "blender",
+      "/godot": "godot",
+      "/systems": "systems",
+      "/graphs": "flexible-graph",
+      "/flexible-graph": "flexible-graph",
+      "/seecode": "flexible-graph",
+      "/harness": "harness",
+      "/rules": "rules",
+      "/fourier": "fourier",
+      "/finance": "finance",
+      "/shaders": "shaders",
+      "/audio": "audio",
+      "/cad": "cad"
+    };
+
+    let currentTab = "foxglade";
+    let blindMode = false;
+    let swapped = false;
+
+    const leftFrame = document.getElementById("leftFrame");
+    const rightFrame = document.getElementById("rightFrame");
+    const leftStrip = document.getElementById("leftStrip");
+    const rightStrip = document.getElementById("rightStrip");
+    const leftHead = document.getElementById("leftHead");
+    const rightHead = document.getElementById("rightHead");
+    const leftSub = document.getElementById("leftSub");
+    const rightSub = document.getElementById("rightSub");
+    const leftFullLink = document.getElementById("leftFullLink");
+    const rightFullLink = document.getElementById("rightFullLink");
+    const voteBar = document.getElementById("voteBar");
+    const votePrompt = document.getElementById("votePrompt");
+    const dirOverlay = document.getElementById("dirOverlay");
+    const dirToggleBtn = document.getElementById("dirToggleBtn");
+
+    function toggleCode(side, forceState) {
+      const drawer = document.getElementById(side + "Drawer");
+      const btn = document.getElementById(side + "CodeBtn");
+      const open = typeof forceState === "boolean" ? forceState : !drawer.classList.contains("open");
+      drawer.classList.toggle("open", open);
+      btn.classList.toggle("active", open);
+    }
+
+    document.getElementById("leftCodeBtn").addEventListener("click", () => toggleCode("left"));
+    document.getElementById("rightCodeBtn").addEventListener("click", () => toggleCode("right"));
+
+    function setDirectoryOpen(open) {
+      dirOverlay.classList.toggle("open", open);
+      dirToggleBtn.classList.toggle("active", open);
+    }
+    dirToggleBtn.addEventListener("click", () => setDirectoryOpen(!dirOverlay.classList.contains("open")));
+
+    function renderDirectoryCards() {
+      const tbody = document.getElementById("dirTableBody");
+      tbody.innerHTML = Object.entries(TABS).map(([key, t]) => `
+        <tr>
+          <td class="dir-col-domain">${t.dirDomain}</td>
+          <td class="dir-col-wo">${t.dirWithout}</td>
+          <td class="dir-col-wi">${t.dirWith}</td>
+          <td class="dir-col-open">
+            <button class="launch-btn" onclick="activateTab('${key}'); setDirectoryOpen(false);">Compare →</button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    function activateTab(tabKey, pushUrl = true) {
+      if (!TABS[tabKey]) tabKey = "foxglade";
+      currentTab = tabKey;
+      const t = TABS[tabKey];
+
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tabKey);
+      });
+
+      toggleCode("left", false);
+      toggleCode("right", false);
+
+      const lUrl = (blindMode && swapped) ? t.rightUrl : t.leftUrl;
+      const rUrl = (blindMode && swapped) ? t.leftUrl : t.rightUrl;
+
+      if (leftFrame.getAttribute("src") !== lUrl) leftFrame.setAttribute("src", lUrl);
+      if (rightFrame.getAttribute("src") !== rUrl) rightFrame.setAttribute("src", rUrl);
+
+      leftFullLink.href = lUrl;
+      rightFullLink.href = t.demoUrl;
+
+      document.getElementById("leftDrawerCode").textContent = t.leftCode;
+      document.getElementById("leftDrawerNotes").textContent = t.leftNotes;
+      document.getElementById("rightDrawerCode").textContent = t.rightCode;
+      document.getElementById("rightDrawerNotes").textContent = t.rightNotes;
+
+      if (blindMode) {
+        leftStrip.className = "pane-strip blind";
+        rightStrip.className = "pane-strip blind";
+        leftHead.textContent = "BLIND BUILD A";
+        rightHead.textContent = "BLIND BUILD B";
+        leftSub.textContent = "· Identity hidden until you cast your vote below";
+        rightSub.textContent = "· Identity hidden until you cast your vote below";
+        voteBar.classList.add("visible");
+        votePrompt.textContent = "Blind A/B Active — Compare both live viewports and vote which build is superior:";
+      } else {
+        leftStrip.className = "pane-strip without";
+        rightStrip.className = "pane-strip with";
+        leftHead.textContent = "WITHOUT BALTOR";
+        rightHead.textContent = "WITH BALTOR";
+        leftSub.textContent = "· " + t.leftSub;
+        rightSub.textContent = "· " + t.rightSub;
+        voteBar.classList.remove("visible");
+      }
+
+      if (pushUrl && window.history && window.history.replaceState) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("tab", tabKey);
+        url.searchParams.delete("view");
+        window.history.replaceState({}, "", url.toString());
+      }
+    }
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        setDirectoryOpen(false);
+        activateTab(btn.dataset.tab);
+      });
+    });
+
+    document.getElementById("blindBtn").addEventListener("click", function() {
+      blindMode = !blindMode;
+      swapped = Math.random() < 0.5;
+      this.classList.toggle("active", blindMode);
+      this.textContent = `Blind A/B Vote: ${blindMode ? "ON" : "OFF"}`;
+      activateTab(currentTab, false);
+    });
+
+    function revealVote(pickedLeft) {
+      const t = TABS[currentTab];
+      const baltorOnLeft = swapped;
+      const pickedBaltor = (pickedLeft && baltorOnLeft) || (!pickedLeft && !baltorOnLeft);
+      leftStrip.className = baltorOnLeft ? "pane-strip with" : "pane-strip without";
+      rightStrip.className = baltorOnLeft ? "pane-strip without" : "pane-strip with";
+      leftHead.textContent = baltorOnLeft ? "WITH BALTOR" : "WITHOUT BALTOR";
+      rightHead.textContent = baltorOnLeft ? "WITHOUT BALTOR" : "WITH BALTOR";
+      leftSub.textContent = "· " + (baltorOnLeft ? t.rightSub : t.leftSub);
+      rightSub.textContent = "· " + (baltorOnLeft ? t.leftSub : t.rightSub);
+      votePrompt.textContent = pickedBaltor
+        ? "✓ Revealed: You voted for the With-Baltor build!"
+        : "Revealed: Build identities unlocked above.";
+    }
+    document.getElementById("voteA").addEventListener("click", () => revealVote(true));
+    document.getElementById("voteB").addEventListener("click", () => revealVote(false));
+
+    renderDirectoryCards();
+
+    // Route initialization from pathname or query string
+    const params = new URLSearchParams(window.location.search);
+    const pathSlug = window.location.pathname.replace(/\/+$/, "") || "/";
+    const legacyMap = {
+      fox: "foxglade",
+      split: "foxglade",
+      survival: "outpost",
+      race: "canyon",
+      relief: "blender",
+      seecode: "flexible-graph"
+    };
+    const requestedTab =
+      params.get("tab") ||
+      legacyMap[params.get("match")] ||
+      legacyMap[params.get("mode")] ||
+      SLUG_TO_TAB[pathSlug] ||
+      "foxglade";
+
+    activateTab(requestedTab, false);
+    if (params.get("view") === "directory") {
+      setDirectoryOpen(true);
+    }
+  </script>
+</body>
+</html>

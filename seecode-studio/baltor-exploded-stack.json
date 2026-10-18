@@ -1,0 +1,12 @@
+{
+  "type": "exploded",
+  "title": "Baltor 3D & Harness Stack",
+  "subtitle": "How Baltor separates authority, engine slots, 3D rigs, and contract cards.",
+  "parts": [
+    { "label": "Sovereign Keyring", "sub": "Scoped tokens & budgets", "kind": "vault", "w": 200, "d": 200, "t": 14 },
+    { "label": "Swappable Engine Slots", "sub": "Native + GitHub adapters", "kind": "studs", "w": 200, "d": 200, "t": 14 },
+    { "label": "49-Bone GLB & PBR Rigs", "sub": "Mesh2Motion & triplanar shaders", "kind": "chip", "w": 200, "d": 200, "t": 14 },
+    { "label": "8-File Contract Cards", "sub": "AGENTS.md, SKILL.md, workflow", "kind": "cards", "w": 200, "d": 200, "t": 14, "focal": true },
+    { "label": "3D & Comparison Studios", "sub": "fox · compare · arena.baltor.ai", "kind": "terminal", "w": 200, "d": 200, "t": 14 }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "retrievedAt": "2026-10-17T22:54:29Z",
+  "purpose": "Local real-animal video pose-estimation experiment, separate from the pre-existing Mesh2Motion game animation clips",
+  "video": {
+    "id": "ondrasko-fox-mouse-2014",
+    "title": "Red fox (Vulpes vulpes) looking for a mouse",
+    "creator": "Lubo Ondrasko",
+    "sourceUrl": "https://vimeo.com/99037431",
+    "distributorPage": "https://commons.wikimedia.org/wiki/File:Red_fox_(Vulpes_vulpes)_looking_for_a_mouse.webm",
+    "pinnedDescriptionPage": "https://commons.wikimedia.org/w/index.php?title=File:Red_fox_(Vulpes_vulpes)_looking_for_a_mouse.webm&oldid=1108669817",
+    "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a9/Red_fox_%28Vulpes_vulpes%29_looking_for_a_mouse.webm",
+    "creationDate": "2014-06-24",
+    "license": "CC-BY-3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+    "licenseEvidence": "Commons states CC BY 3.0, credits Lubo Ondrasko, and records a 2020-03-09 source-license review. The downloaded description revision retains this evidence. The source publisher does not endorse this project.",
+    "licenseEvidencePath": "sources/fox-source-page.html",
+    "licenseEvidenceSha256": "4bc5d556660eb244e83dd464d7ac2da69eaba259a80a213c0a560ca0da2a26c3",
+    "commercialReuseBasis": "CC BY 3.0 allows reuse including commercial use subject to attribution and other applicable rights; this is not a warranty of all rights or legal clearance.",
+    "attribution": "Fox footage: Lubo Ondrasko, Red fox (Vulpes vulpes) looking for a mouse (2014), via Wikimedia Commons, CC BY 3.0. Excerpted, muted and transcoded for the Foxglade motion study. https://commons.wikimedia.org/wiki/File:Red_fox_(Vulpes_vulpes)_looking_for_a_mouse.webm | https://creativecommons.org/licenses/by/3.0/",
+    "original": {
+      "path": "sources/fox-looking-for-mouse.original.webm",
+      "bytes": 17176813,
+      "sha256": "d4f83ce4218eb58f259d3b8b7ed53b61650faad567e037e54d75b464bcd51c0b",
+      "durationSeconds": 73.883,
+      "width": 1280,
+      "height": 720,
+      "fps": 25,
+      "videoCodec": "vp8",
+      "audioCodec": "vorbis"
+    },
+    "excerpt": {
+      "path": "sources/fox-walk-22-31.mp4",
+      "bytes": 3915313,
+      "sha256": "41daba0c56d65defc623cfe89cf8c93e80e77423fb233e52c192091bbdcbbea5",
+      "sourceStartSeconds": 22,
+      "sourceEndSeconds": 31,
+      "durationSeconds": 9,
+      "width": 1280,
+      "height": 720,
+      "fps": 25,
+      "decodedFrames": 225,
+      "audio": false,
+      "modifications": ["9-second excerpt", "audio removed", "H.264 CRF18 yuv420p transcode; dimensions and nominal frame rate retained"],
+      "ffmpegArguments": ["-ss", "22", "-i", "sources/fox-looking-for-mouse.original.webm", "-t", "9", "-an", "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p", "-movflags", "+faststart", "sources/fox-walk-22-31.mp4"],
+      "contactSheet": "sources/fox-walk-22-31-contact.jpg"
+    },
+    "visualReview": {
+      "method": "Sampled contact sheets of original and selected excerpt, not continuous full-video playback",
+      "observations": ["One fox walking mostly side-on", "Some body angle and head turns", "Panning camera", "Paws occasionally obscured by grass"],
+      "limitations": ["Not calibrated 3D motion capture", "Camera pan prevents treating screen displacement as world speed", "Occluded or low-confidence keypoints require masks", "A single short walk does not establish a general fox locomotion model"]
+    }
+  },
+  "poseModel": {
+    "id": "rtmpose-m-ap10k-20230206-onnx",
+    "kind": "pretrained-animal-2d-keypoint-estimator",
+    "trainedByThisProject": false,
+    "officialModelListing": "https://github.com/Tau-J/rtmlib/blob/03a1693e59e4f7cd84582c0fb30459b3bf18ad42/README.md",
+    "officialDownloadUrl": "https://download.openmmlab.com/mmpose/v1/projects/rtmposev1/onnx_sdk/rtmpose-m_simcc-ap10k_pt-aic-coco_210e-256x256-7a041aa1_20230206.zip",
+    "publisherMirror": "https://huggingface.co/Tau-J/RTMPose",
+    "publisherMirrorLicenseLabel": "Apache-2.0",
+    "publisherMirrorLicenseEvidence": "https://huggingface.co/Tau-J/RTMPose/blob/main/README.md",
+    "licenseEvidencePath": "models/model-license-card.txt",
+    "licenseEvidenceSha256": "98b45ea81164d1e1a1dd82255207053b15cd6c69d922a1c5cf3387ce604d4b74",
+    "archive": {
+      "path": "models/rtmpose-ap10k.zip",
+      "bytes": 50709303,
+      "sha256": "2d75445331cf2f21d6e164430f96ffa765cd874872965ae1736932dda03987f0"
+    },
+    "model": {
+      "path": "models/rtmpose-ap10k/20230831/rtmpose_onnx/rtmpose-m_simcc-ap10k_pt-aic-coco_210e-256x256-7a041aa1_20230206/end2end.onnx",
+      "bytes": 54478120,
+      "sha256": "1cfd1c86e0d9e5d5f95178bcd95ee9a4e8386a624cd3c57519f27ff58cac7f28",
+      "outputs": ["simcc_x", "simcc_y"],
+      "keypointCount": 17,
+      "inputShapeCaveat": "The archive filename and upstream model table say 256x256, while detail.json records input_shape [192,256]. Inspect the actual ONNX input and pipeline.json before inference; do not infer tensor dimensions from the filename."
+    },
+    "trainingDataDeclaration": {
+      "dataset": "AP-10K",
+      "officialSource": "https://github.com/AlexTheBad/AP-10K",
+      "declaredDatasetLicense": "CC-BY-4.0",
+      "datasetDownloaded": false,
+      "caveat": "Code, checkpoint and training-data declarations are recorded separately. No audit of every training image, pretraining dataset, or model right is claimed."
+    },
+    "codeLicenses": [
+      {
+        "project": "rtmlib",
+        "commit": "03a1693e59e4f7cd84582c0fb30459b3bf18ad42",
+        "license": "Apache-2.0",
+        "path": "models/RTMLIB-LICENSE.txt",
+        "sha256": "ec0a9c27a980866653f5a9901ea0e2458df074b1516e45c6842736ee5c5a4a1c"
+      },
+      {
+        "project": "MMPose",
+        "commit": "759b39c13fea6ba094afc1fa932f51dc1b11cbf9",
+        "license": "Apache-2.0",
+        "path": "models/MMPOSE-LICENSE.txt",
+        "sha256": "aa2c6f3408169b96e5547c875deb481c91502514c1885fa0acb4b596c8909cb9"
+      }
+    ],
+    "distributionNote": "Keep model weights and archive out of a browser-only game package unless explicitly required. The archive contains sample output JPGs with no separately verified media rights; do not use those samples as project art or include them in release artwork."
+  },
+  "claimsBoundary": {
+    "realAnimalVideo": true,
+    "pretrainedPoseInferenceAvailable": true,
+    "newPoseNetworkTrained": false,
+    "videoDerivedGameAnimationVerified": false,
+    "threeDimensionalMocap": false,
+    "rightsWarranty": false
+  }
+}

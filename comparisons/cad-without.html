@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Without Baltor · Non-Manifold Extrusion with Missing End-Caps & Self-Intersections</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#1b1d24;color:#cbd5e1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;user-select:none}
+canvas{display:block;width:100vw;height:100vh}
+.note{position:fixed;bottom:10px;left:10px;right:10px;background:rgba(18,20,26,0.92);border:1px solid rgba(248,113,113,0.4);border-radius:6px;padding:7px 11px;font-size:11px;color:#fca5a5}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="note">
+  ExtrudeGeometry(unclosedPath, { bevelEnabled: false }) · Missing top/bottom end-caps, inverted face normals, and 18 self-intersecting tooth edges.
+</div>
+<script type="module">
+import * as THREE from "/foxglade-living-wood/vendor/three/three.module.js";
+const renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+renderer.setClearColor(0x1b1d24);
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(45,1,0.1,100);
+camera.position.set(3.4,2.8,3.6);
+camera.lookAt(0,0,0);
+
+scene.add(new THREE.GridHelper(8,12,0x475569,0x272b36));
+scene.add(new THREE.AmbientLight(0xffffff,0.65));
+const dl=new THREE.DirectionalLight(0xffffff,0.75);
+dl.position.set(3,5,2);
+scene.add(dl);
+
+// Broken open-shell star polygon with self-intersecting spikes and missing end-caps
+const group=new THREE.Group();
+const mat=new THREE.MeshLambertMaterial({color:0x64748b,side:THREE.FrontSide,flatShading:true});
+for(let i=0;i<10;i++){
+  const a=(i/10)*Math.PI*2;
+  const g=new THREE.BoxGeometry(0.55,0.45,1.45);
+  const m=new THREE.Mesh(g,mat);
+  m.position.set(Math.cos(a)*0.85,(i%2)*0.12-0.06,Math.sin(a)*0.85);
+  m.rotation.y=-a+0.42; // skewed self-intersection
+  group.add(m);
+}
+// Red non-manifold boundary wireframe
+const wire=new THREE.LineSegments(
+  new THREE.EdgesGeometry(new THREE.CylinderGeometry(1.35,0.95,0.65,9,1,true)),
+  new THREE.LineBasicMaterial({color:0xef4444})
+);
+group.add(wire);
+scene.add(group);
+
+function rs(){
+  const w=window.innerWidth||800,h=window.innerHeight||500;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h;camera.updateProjectionMatrix();
+}
+window.addEventListener('resize',rs);rs();
+
+function loop(t){
+  group.rotation.y=t*0.0005;
+  group.rotation.x=0.25*Math.sin(t*0.0007);
+  renderer.render(scene,camera);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

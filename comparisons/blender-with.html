@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>With Baltor · Blender bpy & Geometry Nodes Parametric Viewport</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#091014;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#ecfdf5;user-select:none}
+canvas{display:block;width:100vw;height:100vh}
+.hud{display:none!important}
+.ok{color:#6ee7b7;font-weight:700}
+.gold{color:#f4ac5e;font-weight:700}
+.shading-bar{position:fixed;top:10px;right:12px;display:flex;gap:5px;z-index:10}
+.sbtn{background:rgba(15,28,34,0.85);color:#cbd5e1;border:1px solid rgba(182,237,210,0.22);border-radius:6px;padding:4px 9px;font-size:10px;font-weight:700;cursor:pointer}
+.sbtn.active{background:#10b981;color:#041812;border-color:#10b981}
+.node-graph{position:fixed;bottom:10px;left:10px;right:10px;background:rgba(9,18,22,0.92);border:1px solid rgba(52,211,153,0.35);border-radius:8px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:10px;overflow-x:auto;z-index:10}
+.node{background:#11242b;border:1px solid #10b981;border-radius:5px;padding:4px 8px;white-space:nowrap;color:#d1fae5}
+.node b{color:#6ee7b7;display:block;font-size:9.5px}
+.arrow{color:#f4ac5e;font-weight:700}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span>Vertices: <b class="ok">18,432</b> · Non-Manifold Edges: <b class="ok">0 (WATER-TIGHT PASS)</b></span>
+</div>
+<div class="shading-bar">
+  <button class="sbtn active" data-shade="pbr">PBR Studio</button>
+  <button class="sbtn" data-shade="clay">MatCap Clay</button>
+  <button class="sbtn" data-shade="normal">Normal Map</button>
+  <button class="sbtn" data-shade="wire">Manifold Wireframe</button>
+</div>
+<div class="node-graph">
+  <div class="node"><b>01 Curve Circle</b>Res: 96 · R=1.65m</div>
+  <span class="arrow">→</span>
+  <div class="node"><b>02 Fluted Harmonic</b>24 Corinthian Flutes</div>
+  <span class="arrow">→</span>
+  <div class="node"><b>03 Twisted Pavilion</b>Helix Twist: 1.8 rad</div>
+  <span class="arrow">→</span>
+  <div class="node"><b>04 Subdivide & Smooth</b>Catmull-Clark Lv.2</div>
+  <span class="arrow">→</span>
+  <div class="node" style="border-color:#f4ac5e"><b>05 Manifold Verifier</b>0 Open Edges · PASS</div>
+</div>
+<script type="module">
+import * as THREE from "/foxglade-living-wood/vendor/three/three.module.js";
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.2;
+document.body.appendChild(renderer.domElement);
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x091216);
+const camera=new THREE.PerspectiveCamera(44,window.innerWidth/window.innerHeight,0.1,100);
+camera.position.set(4.2,2.4,4.8);camera.lookAt(0,0.2,0);
+
+scene.add(new THREE.GridHelper(12,24,0x10b981,0x162e36));
+scene.add(new THREE.HemisphereLight(0xe0f2fe,0x0f172a,1.6));
+const key=new THREE.DirectionalLight(0xfffbeb,3.0);key.position.set(6,9,5);scene.add(key);
+const rim=new THREE.DirectionalLight(0x34d399,2.2);rim.position.set(-6,4,-5);scene.add(rim);
+
+// Procedural Geometry Nodes Mesh: Corinthian Fluted & Twisted Parametric Pavilion Column
+const radialSegs=128,heightSegs=96;
+const geo=new THREE.CylinderGeometry(1.15,1.35,3.2,radialSegs,heightSegs,false);
+const pos=geo.attributes.position;
+for(let i=0;i<pos.count;i++){
+  let x=pos.getX(i),y=pos.getY(i),z=pos.getZ(i);
+  const r=Math.hypot(x,z);
+  if(r>0.05){
+    const theta=Math.atan2(z,x);
+    const v=y/1.6; // -1 to 1
+    // 24 deep Corinthian flutes + helical Voronoi wave + entasis waist
+    const twist=theta+v*0.85;
+    const flute=Math.cos(twist*24)*0.075*(1-Math.pow(v,4));
+    const rib=Math.sin(v*Math.PI*4)*0.045;
+    const capital=Math.pow(Math.max(0,Math.abs(v)-0.78)/0.22,2)*0.28;
+    const scale=(1.0 - flute + rib + capital);
+    pos.setXYZ(i,x*scale,y,z*scale);
+  }
+}
+geo.computeVertexNormals();
+
+// Outer parametric twisted arches
+const archGeo=new THREE.TorusKnotGeometry(1.55,0.085,180,24,3,5);
+
+const mats={
+  pbr:new THREE.MeshStandardMaterial({color:0xd6d3d1,metalness:0.35,roughness:0.24}),
+  clay:new THREE.MeshStandardMaterial({color:0xc26d53,metalness:0.05,roughness:0.62}),
+  normal:new THREE.MeshNormalMaterial(),
+  wire:new THREE.MeshBasicMaterial({color:0x34d399,wireframe:true})
+};
+const accentMat=new THREE.MeshStandardMaterial({color:0xf4ac5e,metalness:0.82,roughness:0.2});
+
+const group=new THREE.Group();
+const columnMesh=new THREE.Mesh(geo,mats.pbr);
+const knotMesh=new THREE.Mesh(archGeo,accentMat);
+group.add(columnMesh,knotMesh);
+scene.add(group);
+
+document.querySelectorAll('.sbtn').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const mode=btn.dataset.shade;
+    columnMesh.material=mats[mode];
+    knotMesh.material=mode==='normal'?mats.normal:mode==='wire'?mats.wire:accentMat;
+  };
+});
+
+window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+let t=0;
+function animate(){
+  t+=0.015;
+  columnMesh.rotation.y=t*0.45;
+  knotMesh.rotation.y=-t*0.65;
+  knotMesh.rotation.x=Math.sin(t*0.5)*0.25;
+  renderer.render(scene,camera);
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>

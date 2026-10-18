@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Without Baltor · Single-Shot LLM Three.js Baseline</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; overflow: hidden; background: #87ceeb; font-family: system-ui, -apple-system, sans-serif; user-select: none; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+    .hud-chip {
+      display: none !important;
+    }
+    .hud-controls {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      background: rgba(15, 18, 24, 0.72);
+      color: #d1d5db;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 10.5px;
+    }
+    .hud-controls button {
+      background: #374151;
+      color: #fff;
+      border: 1px solid #4b5563;
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .hud-controls button:hover { background: #4b5563; }
+  </style>
+</head>
+<body>
+  <div class="hud-chip" id="hudChip">
+    <strong>Without Baltor · Single-Shot LLM Output</strong>
+    <span id="hudSub">Three.js BoxGeometry primitives · Lambert shading · Sine-wave leg swing</span>
+  </div>
+  <div class="hud-controls">
+    <button id="toggleBotBtn" type="button">Auto-Roam: ON</button>
+    <span>WASD / Arrows to steer manually</span>
+  </div>
+
+  <script type="module">
+    import * as THREE from "./vendor/three/three.module.js";
+
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get("mode") || "fox";
+    const hudSub = document.getElementById("hudSub");
+    const toggleBotBtn = document.getElementById("toggleBotBtn");
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 500);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.65);
+    scene.add(ambient);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
+    dirLight.position.set(20, 40, 20);
+    scene.add(dirLight);
+
+    const keys = { w: false, a: false, s: false, d: false };
+    let autoBot = true;
+
+    toggleBotBtn.addEventListener("click", () => {
+      autoBot = !autoBot;
+      toggleBotBtn.textContent = `Auto-Roam: ${autoBot ? "ON" : "OFF"}`;
+    });
+
+    window.addEventListener("keydown", (e) => {
+      const k = e.key.toLowerCase();
+      if (k === "w" || e.key === "ArrowUp") { keys.w = true; autoBot = false; }
+      if (k === "s" || e.key === "ArrowDown") { keys.s = true; autoBot = false; }
+      if (k === "a" || e.key === "ArrowLeft") { keys.a = true; autoBot = false; }
+      if (k === "d" || e.key === "ArrowRight") { keys.d = true; autoBot = false; }
+      toggleBotBtn.textContent = `Auto-Roam: ${autoBot ? "ON" : "OFF"}`;
+    });
+    window.addEventListener("keyup", (e) => {
+      const k = e.key.toLowerCase();
+      if (k === "w" || e.key === "ArrowUp") keys.w = false;
+      if (k === "s" || e.key === "ArrowDown") keys.s = false;
+      if (k === "a" || e.key === "ArrowLeft") keys.a = false;
+      if (k === "d" || e.key === "ArrowRight") keys.d = false;
+    });
+
+    let updateFn = () => {};
+
+    if (mode === "race") {
+      hudSub.textContent = "Three.js BoxGeometry car · Flat gray ribbon · Unlit Lambert cones";
+      scene.background = new THREE.Color(0x93c5fd);
+
+      const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(300, 300),
+        new THREE.MeshLambertMaterial({ color: 0xd97706 })
+      );
+      ground.rotation.x = -Math.PI / 2;
+      scene.add(ground);
+
+      // Simple circular flat track
+      const track = new THREE.Mesh(
+        new THREE.RingGeometry(32, 44, 48),
+        new THREE.MeshBasicMaterial({ color: 0x4b5563, side: THREE.DoubleSide })
+      );
+      track.rotation.x = -Math.PI / 2;
+      track.position.y = 0.05;
+      scene.add(track);
+
+      // Primitive box car
+      const car = new THREE.Group();
+      const chassis = new THREE.Mesh(
+        new THREE.BoxGeometry(1.8, 0.6, 3.4),
+        new THREE.MeshLambertMaterial({ color: 0xef4444 })
+      );
+      chassis.position.y = 0.6;
+      car.add(chassis);
+      const cabin = new THREE.Mesh(
+        new THREE.BoxGeometry(1.4, 0.5, 1.6),
+        new THREE.MeshLambertMaterial({ color: 0x1f2937 })
+      );
+      cabin.position.set(0, 1.1, -0.2);
+      car.add(cabin);
+      scene.add(car);
+
+      // A few blocky rocks
+      for (let i = 0; i < 24; i++) {
+        const ang = (i / 24) * Math.PI * 2;
+        const r = i % 2 === 0 ? 25 : 52;
+        const rock = new THREE.Mesh(
+          new THREE.BoxGeometry(3, 4 + (i % 5), 3),
+          new THREE.MeshLambertMaterial({ color: 0xb45309 })
+        );
+        rock.position.set(Math.cos(ang) * r, 2, Math.sin(ang) * r);
+        scene.add(rock);
+      }
+
+      let angle = 0;
+      let radius = 38;
+      updateFn = (dt) => {
+        if (autoBot) {
+          angle += dt * 0.55;
+          car.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
+          car.rotation.y = -angle;
+        } else {
+          if (keys.a) car.rotation.y += dt * 2.0;
+          if (keys.d) car.rotation.y -= dt * 2.0;
+          const speed = keys.w ? 14 : (keys.s ? -7 : 0);
+          car.position.x -= Math.sin(car.rotation.y) * speed * dt;
+          car.position.z -= Math.cos(car.rotation.y) * speed * dt;
+        }
+        const camOffset = new THREE.Vector3(0, 5.5, 11).applyAxisAngle(new THREE.Vector3(0, 1, 0), car.rotation.y);
+        camera.position.copy(car.position).add(camOffset);
+        camera.lookAt(car.position.x, car.position.y + 1.0, car.position.z);
+      };
+    } else if (mode === "aircraft") {
+      hudSub.textContent = "Three.js primitive box/cone plane · Flat water plane · Basic cylinders";
+      scene.background = new THREE.Color(0xbae6fd);
+
+      const ocean = new THREE.Mesh(
+        new THREE.PlaneGeometry(400, 400),
+        new THREE.MeshLambertMaterial({ color: 0x0284c7 })
+      );
+      ocean.rotation.x = -Math.PI / 2;
+      scene.add(ocean);
+
+      for (let i = 0; i < 8; i++) {
+        const ang = (i / 8) * Math.PI * 2;
+        const isl = new THREE.Mesh(
+          new THREE.CylinderGeometry(8, 12, 3, 12),
+          new THREE.MeshLambertMaterial({ color: 0x65a30d })
+        );
+        isl.position.set(Math.cos(ang) * 55, 1.5, Math.sin(ang) * 55);
+        scene.add(isl);
+      }
+
+      const plane = new THREE.Group();
+      const fuselage = new THREE.Mesh(
+        new THREE.BoxGeometry(0.9, 0.9, 3.8),
+        new THREE.MeshLambertMaterial({ color: 0xf8fafc })
+      );
+      const wing = new THREE.Mesh(
+        new THREE.BoxGeometry(5.6, 0.15, 1.0),
+        new THREE.MeshLambertMaterial({ color: 0xef4444 })
+      );
+      plane.add(fuselage, wing);
+      plane.position.set(0, 14, 0);
+      scene.add(plane);
+
+      let t = 0;
+      updateFn = (dt) => {
+        t += dt;
+        if (autoBot) {
+          const ang = t * 0.4;
+          plane.position.set(Math.cos(ang) * 45, 14 + Math.sin(t * 1.3) * 2, Math.sin(ang) * 45);
+          plane.rotation.y = -ang;
+          plane.rotation.z = 0.22;
+        } else {
+          if (keys.a) plane.rotation.y += dt * 1.6;
+          if (keys.d) plane.rotation.y -= dt * 1.6;
+          plane.position.x -= Math.sin(plane.rotation.y) * 18 * dt;
+          plane.position.z -= Math.cos(plane.rotation.y) * 18 * dt;
+        }
+        const camOffset = new THREE.Vector3(0, 4, 12).applyAxisAngle(new THREE.Vector3(0, 1, 0), plane.rotation.y);
+        camera.position.copy(plane.position).add(camOffset);
+        camera.lookAt(plane.position);
+      };
+    } else {
+      // Default: Fox survival single-shot LLM baseline
+      scene.background = new THREE.Color(0x7c9cb0);
+      scene.fog = new THREE.Fog(0x7c9cb0, 35, 110);
+
+      const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(200, 200, 16, 16),
+        new THREE.MeshLambertMaterial({ color: 0x6b4c35 })
+      );
+      ground.rotation.x = -Math.PI / 2;
+      scene.add(ground);
+
+      const grid = new THREE.GridHelper(200, 40, 0x3e2723, 0x4e342e);
+      grid.position.y = 0.02;
+      scene.add(grid);
+
+      // Flat blue disk pond
+      const pond = new THREE.Mesh(
+        new THREE.CircleGeometry(10, 24),
+        new THREE.MeshBasicMaterial({ color: 0x2563eb })
+      );
+      pond.rotation.x = -Math.PI / 2;
+      pond.position.set(12, 0.03, -8);
+      scene.add(pond);
+
+      // Repetitive Cone + Cylinder trees
+      const trunkGeo = new THREE.CylinderGeometry(0.35, 0.45, 2.4, 8);
+      const trunkMat = new THREE.MeshLambertMaterial({ color: 0x78350f });
+      const leavesGeo = new THREE.ConeGeometry(2.1, 4.8, 8);
+      const leavesMat = new THREE.MeshLambertMaterial({ color: 0x166534 });
+
+      for (let i = 0; i < 45; i++) {
+        const angle = (i * 137.5) * (Math.PI / 180);
+        const r = 14 + (i % 7) * 8;
+        const tx = Math.cos(angle) * r;
+        const tz = Math.sin(angle) * r;
+        if (Math.hypot(tx - 12, tz + 8) < 12) continue;
+        const tree = new THREE.Group();
+        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+        trunk.position.y = 1.2;
+        const crown = new THREE.Mesh(leavesGeo, leavesMat);
+        crown.position.y = 4.2;
+        tree.add(trunk, crown);
+        tree.position.set(tx, 0, tz);
+        scene.add(tree);
+      }
+
+      // Primitive BoxGeometry Fox (what raw single-shot prompts produce)
+      const fox = new THREE.Group();
+      const orangeMat = new THREE.MeshLambertMaterial({ color: 0xea580c });
+      const whiteMat = new THREE.MeshLambertMaterial({ color: 0xf8fafc });
+      const darkMat = new THREE.MeshLambertMaterial({ color: 0x1e293b });
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.65, 1.65), orangeMat);
+      body.position.y = 0.85;
+      fox.add(body);
+
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.6, 0.65), orangeMat);
+      head.position.set(0, 1.15, -0.95);
+      fox.add(head);
+
+      const snout = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.26, 0.42), whiteMat);
+      snout.position.set(0, 1.02, -1.38);
+      fox.add(snout);
+
+      const earL = new THREE.Mesh(new THREE.ConeGeometry(0.14, 0.32, 4), orangeMat);
+      earL.position.set(-0.2, 1.55, -0.9);
+      const earR = earL.clone();
+      earR.position.x = 0.2;
+      fox.add(earL, earR);
+
+      const tail = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.32, 0.95), orangeMat);
+      tail.position.set(0, 0.9, 1.2);
+      tail.rotation.x = -0.35;
+      fox.add(tail);
+
+      const legs = [];
+      const legOffsets = [
+        [-0.24, 0.35, -0.55],
+        [0.24, 0.35, -0.55],
+        [-0.24, 0.35, 0.55],
+        [0.24, 0.35, 0.55],
+      ];
+      for (const [lx, ly, lz] of legOffsets) {
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.7, 0.18), darkMat);
+        leg.position.set(lx, ly, lz);
+        fox.add(leg);
+        legs.push(leg);
+      }
+
+      scene.add(fox);
+
+      let time = 0;
+      let heading = 0;
+      updateFn = (dt) => {
+        time += dt;
+        let moving = false;
+        if (autoBot) {
+          moving = true;
+          heading += Math.sin(time * 0.45) * dt * 0.65;
+          fox.rotation.y = heading;
+          fox.position.x -= Math.sin(heading) * 4.2 * dt;
+          fox.position.z -= Math.cos(heading) * 4.2 * dt;
+          if (fox.position.length() > 32) {
+            heading += dt * 1.8;
+          }
+        } else {
+          if (keys.a) fox.rotation.y += dt * 2.4;
+          if (keys.d) fox.rotation.y -= dt * 2.4;
+          if (keys.w || keys.s) {
+            moving = true;
+            const dir = keys.w ? 1 : -0.6;
+            fox.position.x -= Math.sin(fox.rotation.y) * 5.5 * dir * dt;
+            fox.position.z -= Math.cos(fox.rotation.y) * 5.5 * dir * dt;
+          }
+        }
+
+        // Rigid sine-wave leg swing
+        const swing = moving ? Math.sin(time * 10) * 0.45 : 0;
+        legs[0].rotation.x = swing;
+        legs[3].rotation.x = swing;
+        legs[1].rotation.x = -swing;
+        legs[2].rotation.x = -swing;
+        tail.rotation.y = Math.sin(time * 4) * 0.2;
+
+        const camBack = new THREE.Vector3(0, 2.6, 5.2).applyAxisAngle(new THREE.Vector3(0, 1, 0), fox.rotation.y);
+        camera.position.lerp(fox.position.clone().add(camBack), 0.12);
+        camera.lookAt(fox.position.x, fox.position.y + 0.9, fox.position.z);
+      };
+    }
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    let last = performance.now();
+    function animate(now) {
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
+      updateFn(dt);
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "type": "architecture",
+  "title": "Baltor Subdomain Ontology",
+  "subtitle": "How standalone 3D worlds, visual comparison studios, research portals, and developer registries are separated.",
+  "motion": "trace",
+  "nodes": [
+    { "id": "user", "label": "Visitor / Browser", "sub": "WebGL2 · Desktop", "tag": "CLIENT", "kind": "external", "row": 1, "col": 0 },
+    { "id": "links", "label": "links.baltor.ai", "sub": "Master URL Directory", "tag": "INDEX", "row": 1, "col": 1 },
+    { "id": "fox", "label": "fox.baltor.ai", "sub": "Foxglade 3D + Field Notes", "tag": "WORLD", "focal": true, "row": 0, "col": 2, "group": "cat_b" },
+    { "id": "parkour", "label": "parkour.baltor.ai", "sub": "First-Person 3D Runner", "tag": "WORLD", "row": 0, "col": 3, "group": "cat_b" },
+    { "id": "compare", "label": "compare.baltor.ai", "sub": "1x2 · Wipe · Microscope", "tag": "STUDIO", "focal": true, "row": 1, "col": 2, "group": "cat_c" },
+    { "id": "arena", "label": "arena.baltor.ai", "sub": "Playable 3D Blind A/B", "tag": "ARENA", "row": 1, "col": 3, "group": "cat_c" },
+    { "id": "fellowship", "label": "papers & blog.baltor.ai", "sub": "DueCare · Alpha · PDFs", "tag": "RESEARCH", "row": 2, "col": 2, "group": "cat_a" },
+    { "id": "signals", "label": "signals & agents", "sub": "8-File Harness Registry", "tag": "FUNNEL", "kind": "store", "row": 2, "col": 3, "group": "cat_d" }
+  ],
+  "groups": [
+    { "id": "cat_b", "label": "Cat B · Standalone 3D Worlds" },
+    { "id": "cat_c", "label": "Cat C · Comparison Studios" },
+    { "id": "cat_a", "label": "Cat A · Research & Papers" },
+    { "id": "cat_d", "label": "Cat D · Developer Registries" }
+  ],
+  "edges": [
+    ["user", "links", "Browse directory", "link"],
+    ["links", "fox", "Play 3D world", "primary"],
+    ["links", "compare", "Compare visual proof", "primary"],
+    ["links", "fellowship", "Read monographs", "link"],
+    ["fox", "compare", "With vs Without", "primary"],
+    ["compare", "arena", "Blind A/B match", "primary"],
+    ["fox", "parkour", "Switch 3D world", "async"],
+    ["signals", "compare", "8-file harness", "async"]
+  ]
+}

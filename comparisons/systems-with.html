@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>With Baltor · Interactive Distributed Systems Simulator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#060e12;color:#ecfdf5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;user-select:none}
+canvas{display:block;width:100vw;height:100vh}
+.hud{display:none!important}
+.ok{color:#6ee7b7;font-weight:700}
+.gold{color:#f4ac5e;font-weight:700}
+.dock{position:fixed;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;background:rgba(6,16,22,0.92);border:1px solid rgba(52,211,153,0.35);padding:6px 12px;border-radius:999px;font-size:11px;z-index:10}
+.btns{display:flex;gap:6px}
+.cbtn{background:#0f292e;color:#d1fae5;border:1px solid #10b981;border-radius:999px;padding:4px 11px;font-size:10.5px;font-weight:700;cursor:pointer}
+.cbtn.active{background:#f4ac5e;color:#0f172a;border-color:#f4ac5e}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span>p50: <b class="ok" id="p50">4.2ms</b> · p99: <b class="gold" id="p99">18.6ms</b> · Drop Rate: <b class="ok" id="drop">0.0%</b> · Raft Quorum: <b class="ok" id="quorum">3/3 HEALTHY</b></span>
+</div>
+<canvas id="c"></canvas>
+<div class="dock">
+  <div class="btns">
+    <button class="cbtn" id="spikeBtn">⚡ Spike 10× Traffic</button>
+    <button class="cbtn" id="killBtn">💥 Kill Primary Shard S1</button>
+    <button class="cbtn active" id="cbBtn">🛡️ Circuit Breaker: ON</button>
+  </div>
+  <span style="color:#94a3b8">Edge Anycast → Token Bucket → Consistent Hash Ring (32 vnodes) → Raft Shards</span>
+</div>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W=800,H=500;
+function rs(){W=canvas.width=window.innerWidth||800;H=canvas.height=window.innerHeight||500;}
+window.addEventListener('resize',rs);rs();
+
+let spike=false,shard1Down=false,breaker=true;
+document.getElementById('spikeBtn').onclick=function(){spike=!spike;this.classList.toggle('active',spike);updateMetrics();};
+document.getElementById('killBtn').onclick=function(){shard1Down=!shard1Down;this.classList.toggle('active',shard1Down);updateMetrics();};
+document.getElementById('cbBtn').onclick=function(){breaker=!breaker;this.classList.toggle('active',breaker);this.textContent='🛡️ Circuit Breaker: '+(breaker?'ON':'OFF');updateMetrics();};
+
+function updateMetrics(){
+  document.getElementById('p50').textContent=(spike?6.8:4.2).toFixed(1)+'ms';
+  document.getElementById('p99').textContent=(spike?(breaker?29.4:185.0):18.6).toFixed(1)+'ms';
+  document.getElementById('drop').textContent=(spike&&breaker?'4.2% (Shed)':'0.0%');
+  document.getElementById('quorum').textContent=shard1Down?'2/3 FOLLOWER PROMOTED':'3/3 HEALTHY';
+}
+
+const packets=[];
+function spawnPacket(){
+  const shardIdx=shard1Down?(Math.random()<0.5?1:2):Math.floor(Math.random()*3);
+  const dropped=spike&&breaker&&Math.random()<0.18;
+  packets.push({stage:0,t:0,shard:shardIdx,dropped,yOff:(Math.random()-0.5)*24});
+}
+
+function drawNode(x,y,w,h,title,sub,color='#10b981',down=false){
+  ctx.fillStyle=down?'rgba(127,29,29,0.55)':'rgba(12,32,38,0.92)';
+  ctx.strokeStyle=down?'#ef4444':color;
+  ctx.lineWidth=2;
+  ctx.beginPath();ctx.roundRect(x-w/2,y-h/2,w,h,8);ctx.fill();ctx.stroke();
+  ctx.fillStyle='#f8fafc';ctx.font='700 11px ui-monospace,monospace';
+  ctx.textAlign='center';ctx.fillText(title,x,y-4);
+  ctx.fillStyle=down?'#fca5a5':'#94a3b8';ctx.font='10px ui-monospace,monospace';
+  ctx.fillText(sub,x,y+12);
+}
+
+function loop(now){
+  if(Math.random()<(spike?0.85:0.32))spawnPacket();
+  ctx.fillStyle='#060e12';ctx.fillRect(0,0,W,H);
+
+  // Subtle background grid
+  ctx.strokeStyle='rgba(52,211,153,0.05)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  const x0=W*0.13,x1=W*0.34,x2=W*0.56,x3=W*0.82,cy=H*0.48;
+  const shardY=[cy-95,cy,cy+95];
+
+  // Edges
+  ctx.strokeStyle='rgba(52,211,153,0.25)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x0,cy);ctx.lineTo(x1,cy);ctx.lineTo(x2,cy);ctx.stroke();
+  shardY.forEach((sy,idx)=>{
+    ctx.strokeStyle=(idx===0&&shard1Down)?'rgba(239,68,68,0.35)':'rgba(52,211,153,0.28)';
+    ctx.beginPath();ctx.moveTo(x2,cy);ctx.lineTo(x3,sy);ctx.stroke();
+  });
+
+  // Consistent Hash Ring visual around x2
+  ctx.strokeStyle='rgba(244,172,94,0.45)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(x2,cy,46,0,Math.PI*2);ctx.stroke();
+  for(let v=0;v<12;v++){
+    const a=(v/12)*Math.PI*2+now*0.0006;
+    ctx.fillStyle='#f4ac5e';
+    ctx.beginPath();ctx.arc(x2+Math.cos(a)*46,cy+Math.sin(a)*46,3,0,Math.PI*2);ctx.fill();
+  }
+
+  // Packets
+  for(let i=packets.length-1;i>=0;i--){
+    const p=packets[i];
+    p.t+=0.032;
+    let px=x0,py=cy+p.yOff;
+    if(p.t<1){
+      px=x0+(x1-x0)*p.t;
+    }else if(p.dropped){
+      px=x1+(p.t-1)*40;py=cy+(p.t-1)*110;
+    }else if(p.t<2){
+      px=x1+(x2-x1)*(p.t-1);py=cy+p.yOff*(2-p.t);
+    }else if(p.t<3){
+      const u=p.t-2;
+      px=x2+(x3-x2)*u;
+      py=cy+(shardY[p.shard]-cy)*u;
+    }else{
+      packets.splice(i,1);continue;
+    }
+    ctx.fillStyle=p.dropped?'#f43f5e':(p.shard===0?'#34d399':p.shard===1?'#38bdf8':'#f4ac5e');
+    ctx.beginPath();ctx.arc(px,py,4.2,0,Math.PI*2);ctx.fill();
+  }
+
+  drawNode(x0,cy,118,52,'EDGE ANYCAST','180k req/s BGP','#38bdf8');
+  drawNode(x1,cy,132,54,'TOKEN BUCKET',breaker?'Burst=5000 · Shed ON':'Unthrottled','#10b981');
+  drawNode(x2,cy,124,54,'HASH RING','32 Virtual Nodes','#f4ac5e');
+  drawNode(x3,shardY[0],148,50,'RAFT SHARD S1',shard1Down?'OFFLINE (Rerouted)':'Leader · WAL Sync','#10b981',shard1Down);
+  drawNode(x3,shardY[1],148,50,'RAFT SHARD S2','Quorum Leader · 1.9ms','#38bdf8');
+  drawNode(x3,shardY[2],148,50,'RAFT SHARD S3','Read Replica + Cache','#f4ac5e');
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

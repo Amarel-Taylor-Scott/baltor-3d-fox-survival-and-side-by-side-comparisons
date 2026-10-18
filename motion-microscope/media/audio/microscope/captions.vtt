@@ -1,0 +1,37 @@
+WEBVTT
+
+00:00:00.200 --> 00:00:04.893
+Meet the supplied Mesh2Motion fox, with forty-nine bones and fourteen animation clips.
+
+00:00:05.033 --> 00:00:07.487
+We're inspecting its walk, not creating a new rig.
+
+00:00:08.200 --> 00:00:12.339
+One moment, four useful views: surface, mesh, skeleton, and side profile.
+
+00:00:12.479 --> 00:00:15.380
+They show the same walk, each revealing something different.
+
+00:00:16.200 --> 00:00:18.547
+Now slow the walk and follow how the legs bend.
+
+00:00:18.687 --> 00:00:21.652
+Watch the same pose across all four views before judging it.
+
+00:00:24.200 --> 00:00:26.461
+Pause here, and compare the pose in each panel.
+
+00:00:26.601 --> 00:00:29.844
+Then let the walk resume, keeping your eye on the changing silhouette.
+
+00:00:32.200 --> 00:00:35.912
+The mesh shows the surface structure; the skeleton shows the moving joints.
+
+00:00:36.052 --> 00:00:38.633
+Use both to spot bends that deserve a closer look.
+
+00:00:40.200 --> 00:00:43.784
+Before a longer video, check the full cycle for awkward bends and clipping.
+
+00:00:43.924 --> 00:00:47.508
+Four views help inspection; they don't guarantee perfect animation.

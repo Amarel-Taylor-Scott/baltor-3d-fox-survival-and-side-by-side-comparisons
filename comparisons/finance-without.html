@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Without Baltor · Broken 134% Budget Sum & Unverified Fee Math</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#18151c;color:#e2e8f0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;user-select:none}
+canvas{display:block;width:100vw;height:100vh}
+.note{position:fixed;bottom:10px;left:10px;right:10px;background:rgba(20,16,24,0.9);border:1px solid rgba(248,113,113,0.4);border-radius:6px;padding:7px 11px;font-size:11px;color:#fca5a5}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="note">
+  Accounting Identity Violation: Budget shares sum to 134.0% (Σ ≠ 100%) · Linear fee assumption ignores 30-year compounding drag.
+</div>
+<script>
+const c=document.getElementById('c'),ctx=c.getContext('2d');
+function draw(){
+  const W=c.width=window.innerWidth||800,H=c.height=window.innerHeight||500;
+  ctx.fillStyle='#18151c';ctx.fillRect(0,0,W,H);
+
+  ctx.fillStyle='#fca5a5';
+  ctx.font='bold 13px monospace';
+  ctx.fillText('UNVERIFIED LLM CHART · BUDGET SHARES SUM TO 134% (BROKEN IDENTITY)',28,34);
+
+  const bars=[
+    {label:'Healthcare & HHS',pct:42,col:'#ef4444'},
+    {label:'K-12 & Higher Ed',pct:38,col:'#f97316'},
+    {label:'Pensions & Debt',pct:31,col:'#eab308'},
+    {label:'Infrastructure',pct:23,col:'#a855f7'}
+  ];
+
+  const startY=75,rowH=64,maxW=W*0.58;
+  bars.forEach((b,i)=>{
+    const y=startY+i*rowH;
+    ctx.fillStyle='#cbd5e1';
+    ctx.font='12px monospace';
+    ctx.fillText(`${b.label} (${b.pct}%)`,28,y+16);
+    ctx.fillStyle='#272230';
+    ctx.fillRect(215,y,maxW,26);
+    ctx.fillStyle=b.col;
+    ctx.fillRect(215,y,(b.pct/100)*maxW,26);
+  });
+
+  // Total box showing 134%
+  ctx.strokeStyle='#f87171';
+  ctx.lineWidth=2;
+  ctx.strokeRect(28,startY+4*rowH+10,W-56,56);
+  ctx.fillStyle='#fca5a5';
+  ctx.font='bold 14px monospace';
+  ctx.fillText('TOTAL ALLOCATION = 42% + 38% + 31% + 23% = 134.0%  [FAIL: +34% PHANTOM FUNDS]',44,startY+4*rowH+34);
+  ctx.fillStyle='#94a3b8';
+  ctx.font='11px monospace';
+  ctx.fillText('Fee Estimate: "1.25% fee over 30 years costs 1.25% total" (Ignores exponential e^(-f·T) compounding!)',44,startY+4*rowH+54);
+}
+window.addEventListener('resize',draw);draw();
+</script>
+</body>
+</html>

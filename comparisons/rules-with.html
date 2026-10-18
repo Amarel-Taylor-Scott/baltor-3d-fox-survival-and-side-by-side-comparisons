@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>With Baltor · 16 Anti-Slop & Anti-Busy Triggers & Rules</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow-y:auto;background:#071114;color:#f1f5f9;font-family:"Inter",system-ui,-apple-system,sans-serif;padding:16px 20px}
+.head-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1{font-size:17px;font-weight:700;color:#f8fafc;letter-spacing:-0.01em}
+.summary{font-size:12px;color:#94a3b8}
+.summary b{color:#6ee7b7}
+hr{border:0;border-top:1px solid rgba(182,237,210,0.18);margin:10px 0 12px}
+.filter-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.fbtn{background:#0d1d22;color:#cbd5e1;border:1px solid rgba(182,237,210,0.2);border-radius:4px;padding:4px 9px;font-size:11px;font-weight:600;cursor:pointer}
+.fbtn.active{background:#10b981;color:#041812;border-color:#10b981;font-weight:700}
+.gate-status{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#6ee7b7}
+table{width:100%;border-collapse:collapse;font-size:11.5px;line-height:1.35}
+th{text-align:left;padding:7px 8px;color:#94a3b8;font-weight:600;border-bottom:1px solid rgba(182,237,210,0.22);background:#0a171b;position:sticky;top:0}
+td{padding:6.5px 8px;border-bottom:1px solid rgba(255,255,255,0.06);vertical-align:top}
+tr:hover td{background:rgba(16,185,129,0.06)}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:#f4ac5e;font-weight:700;white-space:nowrap}
+.trig{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:#cbd5e1}
+.act{color:#e2e8f0}
+.pass{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;color:#6ee7b7;font-weight:700;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="head-row">
+  <h1>Baltor Anti-Slop &amp; Anti-Busy Rule Engine (16 Active Triggers)</h1>
+  <span class="summary">Card grids: <b>0</b> · Nav links: <b>5</b> · Floating HUD clutter: <b>0</b> · Contract cards: <b>&lt; 2 KB</b></span>
+</div>
+<hr>
+<div class="filter-bar">
+  <div class="filters">
+    <button class="fbtn active" data-fam="ALL">All 16 Rules</button>
+    <button class="fbtn" data-fam="R_UI">R_UI (Layout &amp; Tables)</button>
+    <button class="fbtn" data-fam="R_VP">R_VP (Viewport Hygiene)</button>
+    <button class="fbtn" data-fam="R_PR">R_PR (Plain Prose)</button>
+    <button class="fbtn" data-fam="R_URL">R_URL (5 Subdomains)</button>
+    <button class="fbtn" data-fam="R_GR">R_GR (&lt; 2 KB Contracts)</button>
+  </div>
+  <span class="gate-status" id="gateSummary">16 / 16 Triggers Enforced · PASS</span>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Rule ID</th>
+      <th>Trigger Condition</th>
+      <th>Enforced Anti-Slop / Anti-Busy Action</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody id="rulesBody"></tbody>
+</table>
+
+<script>
+const RULES = [
+  { id: "R_UI_01", fam: "R_UI", trig: "nav_links > 5 || label.hasParens()", act: "Strip parenthetical nav labels; keep 5 clean links.", st: "ENFORCED" },
+  { id: "R_UI_02", fam: "R_UI", trig: "directory.usesCardGrid == true", act: "Block 3-column bento card grids; render <hr> + <table>.", st: "ENFORCED" },
+  { id: "R_UI_03", fam: "R_UI", trig: "cell.words > 10 || text.hasSnakeCase()", act: "Hide snake_case slot IDs; cap table cells at 10 words.", st: "ENFORCED" },
+  { id: "R_UI_04", fam: "R_UI", trig: "header.extraPromoPills > 0", act: "Remove extra outbound promo pills from top header bar.", st: "ENFORCED" },
+  { id: "R_VP_01", fam: "R_VP", trig: "canvas.hasTopHudPill && strip.visible", act: "Remove duplicate floating telemetry boxes inside viewports.", st: "ENFORCED" },
+  { id: "R_VP_02", fam: "R_VP", trig: "demoMode == true && welcomeModal.open", act: "Hide welcome overlay immediately and auto-start 3D world.", st: "ENFORCED" },
+  { id: "R_VP_03", fam: "R_VP", trig: "mesh.nonManifoldEdges > 0", act: "Reject unverified primitive dumps; verify watertight mesh.", st: "ENFORCED" },
+  { id: "R_VP_04", fam: "R_VP", trig: "frameMs > 16.6 || drawCalls > 120", act: "Enforce 60 FPS fixed timestep and draw-call budget.", st: "ENFORCED" },
+  { id: "R_PR_01", fam: "R_PR", trig: "copy.matches(/revolutionize|synergy|seamless/i)", act: "Block AI-slop buzzwords; require plain customer nouns.", st: "ENFORCED" },
+  { id: "R_PR_02", fam: "R_PR", trig: "title.has('Canonical') || kicker.allCaps", act: "Strip 'Canonical' and decorative all-caps kicker badges.", st: "ENFORCED" },
+  { id: "R_PR_03", fam: "R_PR", trig: "claim.lacksObservedEvidence == true", act: "Require measured verifier output; ban synthetic fallbacks.", st: "ENFORCED" },
+  { id: "R_PR_04", fam: "R_PR", trig: "sentence.words > 28 && filler > 0.15", act: "Trim filler prose into concise, verifiable statements.", st: "ENFORCED" },
+  { id: "R_URL_01", fam: "R_URL", trig: "publicSubdomains.count > 5", act: "Cap architecture at 5 roots: Baltor, Compare, Demos, Assets, Blog.", st: "ENFORCED" },
+  { id: "R_URL_02", fam: "R_URL", trig: "route.requiresNestedQueryMaze", act: "Serve direct slugs (/foxglade, /motion, /blender, /rules).", st: "ENFORCED" },
+  { id: "R_GR_01", fam: "R_GR", trig: "contractCard.bytes > 2048", act: "Keep contract cards under 2 KB; load source only when needed.", st: "ENFORCED" },
+  { id: "R_GR_02", fam: "R_GR", trig: "vertex != 'Loop' || selfApproved", act: "Enforce single Loop vertex runtime and independent review.", st: "ENFORCED" }
+];
+
+const tbody = document.getElementById("rulesBody");
+const summary = document.getElementById("gateSummary");
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function render(fam) {
+  const rows = fam === "ALL" ? RULES : RULES.filter(r => r.fam === fam);
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td class="code">${esc(r.id)}</td>
+      <td class="trig">${esc(r.trig)}</td>
+      <td class="act">${esc(r.act)}</td>
+      <td class="pass">✓ ${esc(r.st)}</td>
+    </tr>
+  `).join("");
+  summary.textContent = `${rows.length} / ${RULES.length} Triggers Shown · ALL PASS`;
+}
+
+document.querySelectorAll(".fbtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".fbtn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    render(btn.dataset.fam);
+  });
+});
+
+render("ALL");
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+[
+  {
+    "id": "light-editorial",
+    "title": "Light reveals\nthe form.",
+    "topic": "lighting",
+    "layout": "2x2",
+    "style": "editorial",
+    "duration": 8,
+    "note": "A synchronized four-view study of one original object. Soft fill is a multi-light approximation, not ray tracing or a measured emitter-size experiment.",
+    "claim_refs": [
+      "https://docs.blender.org/manual/en/latest/render/lights/light_object.html"
+    ],
+    "panels": [
+      "Ambient",
+      "Hard key",
+      "Soft fill",
+      "Key + rim"
+    ]
+  },
+  {
+    "id": "light-neon",
+    "title": "Same shape.\nNew attitude.",
+    "topic": "lighting",
+    "layout": "2x2",
+    "style": "neon",
+    "duration": 8,
+    "note": "A bolder violet and cyan lighting study with restrained border bloom and identical object animation in all four panels.",
+    "claim_refs": [
+      "https://docs.blender.org/manual/en/latest/render/lights/light_object.html"
+    ],
+    "panels": [
+      "Ambient",
+      "Hard key",
+      "Soft fill",
+      "Key + rim"
+    ]
+  },
+  {
+    "id": "surface-editorial",
+    "title": "Texture is not\nalways shape.",
+    "topic": "surface",
+    "layout": "2x2",
+    "style": "editorial",
+    "duration": 8,
+    "note": "Plain, bump-only, mesh-relief and hybrid vases. The geometry variants deliberately change the silhouette; bump perturbs lighting only.",
+    "claim_refs": [
+      "https://threejs.org/docs/#MeshStandardMaterial"
+    ],
+    "panels": [
+      "Smooth",
+      "Bump only",
+      "Real relief",
+      "Hybrid"
+    ]
+  },
+  {
+    "id": "surface-neon",
+    "title": "Make the detail\nleave the surface.",
+    "topic": "surface",
+    "layout": "2x2",
+    "style": "neon",
+    "duration": 8,
+    "note": "The same surface comparison with violet glazed material and stronger grazing light. Matched camera and base shape; geometry relief is authored, not reconstructed from an image.",
+    "claim_refs": [
+      "https://threejs.org/docs/#MeshStandardMaterial"
+    ],
+    "panels": [
+      "Smooth",
+      "Bump only",
+      "Real relief",
+      "Hybrid"
+    ]
+  },
+  {
+    "id": "pendulum-split",
+    "title": "Longer pendulum.\nSlower swing.",
+    "topic": "pendulum",
+    "layout": "1x2",
+    "style": "editorial",
+    "duration": 8,
+    "note": "One row, two columns. Shared scale and pivot height: lengths 1 m and 4 m, amplitude 0.1 rad, gravity 9.81 m/s\u00c2\u00b2. Small-angle analytical model, no drag. Trace is angle versus real elapsed time.",
+    "claim_refs": [
+      "https://openstax.org/books/university-physics-volume-1/pages/15-4-pendulums"
+    ],
+    "panels": [
+      "1 m",
+      "4 m"
+    ]
+  },
+  {
+    "id": "cache-stack",
+    "title": "Same request.\nLess repeated work.",
+    "topic": "cache",
+    "layout": "2x1",
+    "style": "neon",
+    "duration": 8,
+    "note": "Two rows, one column. First call computes and caches a result; a repeated call with the same input reuses the valid result. Authored animation timing is illustrative, not a speed benchmark. Invalidation and storage costs still matter.",
+    "claim_refs": [
+      "https://docs.python.org/3/library/functools.html"
+    ],
+    "panels": [
+      "Without cache",
+      "With cache"
+    ]
+  }
+]

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>With Baltor · 3D Commercial Product Reveal & Anisotropic Studio</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#05080b;color:#f8fafc;font-family:"Inter",system-ui,-apple-system,sans-serif;user-select:none}
+canvas{display:block;width:100vw;height:100vh}
+.hud{display:none!important}
+.ok{color:#6ee7b7;font-weight:700}
+.gold{color:#f4ac5e;font-weight:700}
+.editorial-copy{position:fixed;top:20px;left:22px;max-width:300px;pointer-events:none;z-index:10}
+.eyebrow{font-family:ui-monospace,monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#f4ac5e;margin-bottom:6px;display:block}
+.editorial-copy h1{font-size:24px;font-weight:800;letter-spacing:-0.02em;line-height:1.15;color:#f8fafc;margin-bottom:8px}
+.editorial-copy p{font-size:12px;color:#94a3b8;line-height:1.5}
+.dock{position:fixed;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;background:rgba(6,14,18,0.9);border:1px solid rgba(244,172,94,0.38);padding:6px 12px;border-radius:999px;font-size:11px;z-index:10;flex-wrap:wrap}
+.beats,.mats{display:flex;gap:5px}
+.pill{background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(255,255,255,0.14);border-radius:999px;padding:4px 9px;font-size:10px;font-weight:600;cursor:pointer}
+.pill.active{background:#f4ac5e;color:#0f172a;border-color:#f4ac5e;font-weight:700}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span>Beat: <b class="gold" id="beatName">01 · Macro Rim Reveal</b> · Light: <b class="ok">3-Point Anisotropic Sweep</b></span>
+</div>
+<div class="editorial-copy">
+  <span class="eyebrow" id="spotTag">BALTOR CHRONO-CORE · ARCHIVAL SPOT</span>
+  <h1 id="spotTitle">Machined titanium. Zero optical drift.</h1>
+  <p id="spotSub">360° Three.js PBR hero assembly with automated 4-beat commercial camera keyframes and exploded internal optics.</p>
+</div>
+<div class="dock">
+  <div class="beats">
+    <button class="pill active" data-beat="0">01 Macro Rim</button>
+    <button class="pill" data-beat="1">02 Exploded Core</button>
+    <button class="pill" data-beat="2">03 Light Sweep</button>
+    <button class="pill" data-beat="3">04 Hero Lockup</button>
+  </div>
+  <div class="mats">
+    <button class="pill active" data-mat="titanium">Titanium</button>
+    <button class="pill" data-mat="obsidian">Obsidian</button>
+    <button class="pill" data-mat="gold">24K Gold</button>
+  </div>
+</div>
+<script type="module">
+import * as THREE from "/foxglade-living-wood/vendor/three/three.module.js";
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.25;
+document.body.appendChild(renderer.domElement);
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x060b10);
+scene.fog=new THREE.FogExp2(0x060b10,0.035);
+const camera=new THREE.PerspectiveCamera(42,window.innerWidth/window.innerHeight,0.1,100);
+
+// 3-Point Studio Rim Lighting
+scene.add(new THREE.AmbientLight(0xdbeafe,0.55));
+const keyLight=new THREE.DirectionalLight(0xfffbeb,3.4);
+keyLight.position.set(5,7,6);scene.add(keyLight);
+const rimLight=new THREE.PointLight(0x34d399,5.5,18);
+rimLight.position.set(-4,3,-4);scene.add(rimLight);
+const warmSweep=new THREE.PointLight(0xf4ac5e,6.0,20);
+warmSweep.position.set(4,-2,4);scene.add(warmSweep);
+
+// Precision 3D Hardware Hero Assembly (Explodable!)
+const hero=new THREE.Group();
+scene.add(hero);
+
+const outerMat=new THREE.MeshStandardMaterial({color:0x94a3b8,metalness:0.88,roughness:0.18});
+const accentMat=new THREE.MeshStandardMaterial({color:0xf4ac5e,metalness:0.92,roughness:0.14});
+const glassMat=new THREE.MeshPhysicalMaterial({color:0x38bdf8,metalness:0.1,roughness:0.05,transmission:0.75,transparent:true,opacity:0.82});
+const coreMat=new THREE.MeshStandardMaterial({color:0x10b981,emissive:0x059669,emissiveIntensity:1.4,roughness:0.2});
+
+const outerBezel=new THREE.Mesh(new THREE.TorusGeometry(1.75,0.22,28,96),outerMat);
+const innerGimbal=new THREE.Mesh(new THREE.TorusGeometry(1.32,0.12,24,80),accentMat);
+const statorRing=new THREE.Mesh(new THREE.CylinderGeometry(1.55,1.55,0.38,64,1,true),outerMat);
+statorRing.rotation.x=Math.PI/2;
+const lensFront=new THREE.Mesh(new THREE.CylinderGeometry(1.18,1.18,0.14,48),glassMat);
+lensFront.rotation.x=Math.PI/2;
+const lensBack=lensFront.clone();
+const quantumCore=new THREE.Mesh(new THREE.IcosahedronGeometry(0.62,2),coreMat);
+
+// Fin blades around bezel
+const fins=new THREE.Group();
+for(let i=0;i<24;i++){
+  const a=(i/24)*Math.PI*2;
+  const fin=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.28,0.42),accentMat);
+  fin.position.set(Math.cos(a)*1.46,Math.sin(a)*1.46,0);
+  fin.rotation.z=a;
+  fins.add(fin);
+}
+hero.add(outerBezel,innerGimbal,statorRing,lensFront,lensBack,quantumCore,fins);
+
+// Reflective studio pedestal
+const ped=new THREE.Mesh(new THREE.CylinderGeometry(3.2,3.6,0.25,64),new THREE.MeshStandardMaterial({color:0x0f172a,metalness:0.7,roughness:0.25}));
+ped.position.y=-2.35;scene.add(ped);
+
+// Volumetric Bokeh Particles
+const bokehGeo=new THREE.BufferGeometry();
+const bPos=[];
+for(let i=0;i<160;i++){
+  bPos.push((Math.random()-0.5)*14,(Math.random()-0.5)*9,(Math.random()-0.5)*10-2);
+}
+bokehGeo.setAttribute('position',new THREE.Float32BufferAttribute(bPos,3));
+const bokeh=new THREE.Points(bokehGeo,new THREE.PointsMaterial({color:0xf4ac5e,size:0.09,transparent:true,opacity:0.65}));
+scene.add(bokeh);
+
+const BEATS=[
+  {name:'01 · Macro Rim Reveal',title:'Machined titanium. Zero optical drift.',explode:0.0,cam:[2.8,1.1,4.2]},
+  {name:'02 · Exploded Internals',title:'Every optical ring verified in 3D space.',explode:1.15,cam:[3.6,1.6,4.8]},
+  {name:'03 · Anisotropic Light Sweep',title:'Grazing key + rim choreography at 60 FPS.',explode:0.35,cam:[-3.1,0.9,4.3]},
+  {name:'04 · Hero Commercial Lockup',title:'Ready for web, broadcast, and interactive retail.',explode:0.0,cam:[0.4,0.3,5.2]}
+];
+let beatIdx=0,manualBeatUntil=0,explodeCur=0;
+
+document.querySelectorAll('[data-beat]').forEach(btn=>{
+  btn.onclick=()=>{
+    beatIdx=Number(btn.dataset.beat);
+    manualBeatUntil=performance.now()+8000;
+    updateBeatUI();
+  };
+});
+document.querySelectorAll('[data-mat]').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('[data-mat]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const m=btn.dataset.mat;
+    if(m==='titanium'){outerMat.color.setHex(0x94a3b8);accentMat.color.setHex(0xf4ac5e);}
+    if(m==='obsidian'){outerMat.color.setHex(0x1e293b);accentMat.color.setHex(0x34d399);}
+    if(m==='gold'){outerMat.color.setHex(0xfbbf24);accentMat.color.setHex(0xfef08a);}
+  };
+});
+
+function updateBeatUI(){
+  document.querySelectorAll('[data-beat]').forEach((b,i)=>b.classList.toggle('active',i===beatIdx));
+  document.getElementById('beatName').textContent=BEATS[beatIdx].name;
+  document.getElementById('spotTitle').textContent=BEATS[beatIdx].title;
+}
+
+window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+
+let t=0;
+function animate(now){
+  t+=0.016;
+  if(now>manualBeatUntil && Math.floor(t/4.0)%4 !== beatIdx){
+    beatIdx=Math.floor(t/4.0)%4;
+    updateBeatUI();
+  }
+  const b=BEATS[beatIdx];
+  explodeCur+=(b.explode-explodeCur)*0.08;
+
+  // Exploded view offsets along Z axis
+  lensFront.position.z=0.36+explodeCur*1.05;
+  lensBack.position.z=-0.36-explodeCur*1.05;
+  innerGimbal.position.z=explodeCur*0.52;
+  fins.position.z=-explodeCur*0.48;
+
+  hero.rotation.y=t*0.55;
+  hero.rotation.x=Math.sin(t*0.7)*0.22;
+  innerGimbal.rotation.x=t*1.1;
+  quantumCore.rotation.y=-t*1.4;
+  quantumCore.rotation.z=t*0.9;
+
+  warmSweep.position.x=Math.cos(t*1.6)*5.5;
+  warmSweep.position.z=Math.sin(t*1.6)*5.5;
+  bokeh.rotation.y=t*0.08;
+
+  const targetCam=new THREE.Vector3(...b.cam);
+  camera.position.lerp(targetCam,0.06);
+  camera.lookAt(0,0,0);
+
+  renderer.render(scene,camera);
+  requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>

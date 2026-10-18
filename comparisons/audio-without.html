@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Without Baltor · Clipped Un-Enveloped Square Oscillator (+6.4 dBFS)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#191418;color:#cbd5e1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;user-select:none}
+canvas{display:block;width:100vw;height:100vh}
+.note{position:fixed;bottom:10px;left:10px;right:10px;background:rgba(20,14,18,0.92);border:1px solid rgba(248,113,113,0.4);border-radius:6px;padding:7px 11px;font-size:11px;color:#fca5a5}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="note">
+  osc.type = "square"; osc.connect(ctx.destination); · Zero ADSR envelope click protection, severe Nyquist foldback aliasing, and +6.4 dBFS hard clipping.
+</div>
+<script>
+const c=document.getElementById('c'),ctx=c.getContext('2d');
+let t=0;
+function loop(){
+  const W=c.width=window.innerWidth||800,H=c.height=window.innerHeight||500;
+  ctx.fillStyle='#191418';ctx.fillRect(0,0,W,H);
+
+  // Red clipping ceiling lines
+  const topClip=H*0.2,botClip=H*0.76;
+  ctx.strokeStyle='rgba(248,113,113,0.45)';
+  ctx.setLineDash([5,5]);
+  ctx.beginPath();ctx.moveTo(0,topClip);ctx.lineTo(W,topClip);ctx.moveTo(0,botClip);ctx.lineTo(W,botClip);ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle='#ef4444';
+  ctx.font='bold 12px monospace';
+  ctx.fillText('HARD CLIP CEILING (+6.4 dBFS · DC OFFSET +0.18V · ALIASED HARMONICS)',24,topClip-10);
+
+  // Clipped square wave with harsh aliasing jaggedness
+  ctx.strokeStyle='#f87171';
+  ctx.lineWidth=2.5;
+  ctx.beginPath();
+  for(let x=0;x<W;x++){
+    const ph=x*0.035+t;
+    const raw=Math.sin(ph)*2.2+0.35*Math.sin(ph*13.7)+0.28;
+    const clipped=Math.max(-1,Math.min(1,raw));
+    const y=(topClip+botClip)/2 - clipped*(botClip-topClip)*0.5;
+    if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  t+=0.08;
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

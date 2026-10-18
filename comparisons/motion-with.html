@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>With Baltor · Motion Graphics, RK4 Spring Typography & 200-Circle Fourier Epicycles</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#060c10;color:#f0fdf4;font-family:"Inter",system-ui,-apple-system,sans-serif;user-select:none}
+canvas{display:block;width:100vw;height:100vh}
+.hud{display:none!important}
+.ok{color:#6ee7b7;font-weight:700}
+.gold{color:#f4ac5e;font-weight:700}
+.dock{position:fixed;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(6,16,20,0.9);border:1px solid rgba(52,211,153,0.35);padding:6px 12px;border-radius:999px;font-size:11px;z-index:10}
+.pills{display:flex;gap:6px}
+.pill{background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(182,237,210,0.22);border-radius:999px;padding:4px 10px;font-size:10.5px;font-weight:600;cursor:pointer}
+.pill.active{background:#10b981;color:#051b14;border-color:#10b981;font-weight:700}
+.scrub{display:flex;align-items:center;gap:8px;font-family:ui-monospace,monospace;font-size:10.5px}
+.scrub input{width:130px;accent-color:#10b981;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span>Spring: <b class="ok">RK4 (k=280, c=18)</b> · Epicycles: <b class="gold">N=200 Harmonics</b> · Color: <b class="ok">Oklab Perceptual</b></span>
+</div>
+<canvas id="c"></canvas>
+<div class="dock">
+  <div class="pills">
+    <button class="pill active" data-style="epicycle">01 · Fourier Epicycle Emblem + Kinetic Type</button>
+    <button class="pill" data-style="editorial">02 · Editorial Spring Stagger</button>
+    <button class="pill" data-style="hud">03 · Cyber HUD Telemetry Broadcast</button>
+  </div>
+  <div class="scrub">
+    <span>Stiffness <b id="kVal">280</b></span>
+    <input type="range" id="kRange" min="120" max="480" value="280">
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W=800,H=500;
+function rs(){W=canvas.width=window.innerWidth||800;H=canvas.height=window.innerHeight||500;}
+window.addEventListener('resize',rs);rs();
+
+let styleMode='epicycle';
+let stiffness=280,damping=18;
+document.getElementById('kRange').oninput=e=>{stiffness=Number(e.target.value);document.getElementById('kVal').textContent=stiffness;triggerSpringPulse();};
+document.querySelectorAll('.pill').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    styleMode=btn.dataset.style;
+    triggerSpringPulse();
+  };
+});
+
+// Precompute parametric target emblem & DFT Fourier harmonics (up to 200 circles)
+const SAMPLE_N=200;
+const emblemSamples=[];
+for(let i=0;i<SAMPLE_N;i++){
+  const t=(i/SAMPLE_N)*Math.PI*2;
+  // Parametric star-lotus emblem
+  const r=1+0.36*Math.cos(5*t)+0.14*Math.cos(10*t);
+  const x=Math.cos(t)*r*92;
+  const y=Math.sin(t)*r*92;
+  emblemSamples.push({re:x,im:y});
+}
+const harmonics=[];
+for(let k=-60;k<=60;k++){
+  let sumRe=0,sumIm=0;
+  for(let n=0;n<SAMPLE_N;n++){
+    const phi=(-2*Math.PI*k*n)/SAMPLE_N;
+    const c=Math.cos(phi),s=Math.sin(phi);
+    sumRe+=emblemSamples[n].re*c - emblemSamples[n].im*s;
+    sumIm+=emblemSamples[n].re*s + emblemSamples[n].im*c;
+  }
+  sumRe/=SAMPLE_N;sumIm/=SAMPLE_N;
+  harmonics.push({freq:k,amp:Math.hypot(sumRe,sumIm),phase:Math.atan2(sumIm,sumRe)});
+}
+harmonics.sort((a,b)=>b.amp-a.amp);
+
+// RK4 Spring glyphs
+const WORDS=["PRECISION","HARMONIC","KINETIC","INTELLIGENCE"];
+let wordIdx=0;
+let glyphs=[];
+function initGlyphs(word){
+  glyphs=word.split('').map((ch,i)=>({
+    ch,
+    y:110,
+    vy:0,
+    scale:0.3,
+    vscale:0,
+    rot:(i%2===0?-0.45:0.45),
+    vrot:0,
+    delay:i*0.045
+  }));
+}
+initGlyphs(WORDS[0]);
+function triggerSpringPulse(){
+  wordIdx=(wordIdx+1)%WORDS.length;
+  initGlyphs(WORDS[wordIdx]);
+}
+setInterval(triggerSpringPulse,3400);
+
+const tracePath=[];
+let phase=0,lastT=performance.now();
+
+function stepSpring(val,vel,target,k,c,dt){
+  const f=-k*(val-target)-c*vel;
+  vel+=f*dt;
+  val+=vel*dt;
+  return [val,vel];
+}
+
+function loop(now){
+  const dt=Math.min(0.033,(now-lastT)/1000);lastT=now;
+  phase+=dt*1.35;
+
+  // Deep Oklab-inspired radial backdrop
+  const grad=ctx.createRadialGradient(W*0.5,H*0.48,20,W*0.5,H*0.5,Math.max(W,H)*0.7);
+  grad.addColorStop(0,'#0d2628');
+  grad.addColorStop(0.55,'#071418');
+  grad.addColorStop(1,'#04090c');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+
+  // Subtle geometric grid
+  ctx.strokeStyle='rgba(182,237,210,0.05)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=44){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=44){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // 1. Left/Center: 200-Circle Fourier Epicycle Harmonic Engine
+  const epiCx=styleMode==='editorial'?W*0.24:W*0.30;
+  const epiCy=H*0.48;
+  let vx=epiCx,vy=epiCy;
+  for(let i=0;i<harmonics.length;i++){
+    const h=harmonics[i];
+    const prevX=vx,prevY=vy;
+    const ang=h.freq*phase+h.phase;
+    vx+=h.amp*Math.cos(ang);
+    vy+=h.amp*Math.sin(ang);
+    if(h.amp>1.2){
+      ctx.strokeStyle=i<6?'rgba(244,172,94,0.34)':'rgba(52,211,153,0.18)';
+      ctx.lineWidth=1;
+      ctx.beginPath();ctx.arc(prevX,prevY,h.amp,0,Math.PI*2);ctx.stroke();
+      ctx.strokeStyle=i<6?'rgba(244,172,94,0.75)':'rgba(110,231,183,0.45)';
+      ctx.beginPath();ctx.moveTo(prevX,prevY);ctx.lineTo(vx,vy);ctx.stroke();
+    }
+  }
+  tracePath.push({x:vx,y:vy});
+  if(tracePath.length>220)tracePath.shift();
+
+  ctx.beginPath();
+  tracePath.forEach((p,i)=>{if(i===0)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+  ctx.strokeStyle='#f4ac5e';ctx.lineWidth=2.6;ctx.stroke();
+  ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(vx,vy,4,0,Math.PI*2);ctx.fill();
+
+  // 2. Right: Staggered RK4 Spring-Physics Kinetic Typography
+  const textStartX=W*0.48;
+  const textCy=H*0.42;
+  ctx.save();
+  ctx.font='800 11px ui-monospace, monospace';
+  ctx.fillStyle='#6ee7b7';
+  ctx.fillText('RK4 SPRING SOLVER · STAGGERED PER-GLYPH KINEMATICS',textStartX,textCy-68);
+
+  const fontSize=Math.min(46,Math.max(26,Math.floor(W*0.044)));
+  ctx.font=`900 ${fontSize}px "Inter", system-ui, sans-serif`;
+  let cursorX=textStartX;
+  glyphs.forEach((g,i)=>{
+    if(g.delay>0){g.delay-=dt;}
+    else{
+      [g.y,g.vy]=stepSpring(g.y,g.vy,0,stiffness,damping,dt);
+      [g.scale,g.vscale]=stepSpring(g.scale,g.vscale,1.0,stiffness,damping,dt);
+      [g.rot,g.vrot]=stepSpring(g.rot,g.vrot,0,stiffness,damping,dt);
+    }
+    const gw=ctx.measureText(g.ch).width+4;
+    ctx.save();
+    ctx.translate(cursorX+gw*0.5,textCy+g.y);
+    ctx.rotate(g.rot);
+    ctx.scale(g.scale,g.scale);
+    const hue=(155+i*14+now*0.04)%360;
+    ctx.fillStyle=styleMode==='hud'?`hsl(${hue},90%,72%)`:'#f8fafc';
+    ctx.shadowColor='rgba(16,185,129,0.55)';
+    ctx.shadowBlur=16;
+    ctx.fillText(g.ch,-gw*0.5,0);
+    ctx.restore();
+    cursorX+=gw;
+  });
+
+  // Spring response curve plot
+  const plotY=textCy+44,plotW=Math.min(340,W*0.44),plotH=54;
+  ctx.fillStyle='rgba(9,24,28,0.78)';
+  ctx.strokeStyle='rgba(52,211,153,0.3)';
+  ctx.fillRect(textStartX,plotY,plotW,plotH);
+  ctx.strokeRect(textStartX,plotY,plotW,plotH);
+  ctx.beginPath();
+  let simY=1,simV=0;
+  for(let x=0;x<plotW;x++){
+    [simY,simV]=stepSpring(simY,simV,0,stiffness,damping,0.004);
+    const py=plotY+plotH*0.55+simY*22;
+    if(x===0)ctx.moveTo(textStartX+x,py);else ctx.lineTo(textStartX+x,py);
+  }
+  ctx.strokeStyle='#34d399';ctx.lineWidth=2;ctx.stroke();
+  ctx.restore();
+
+  // 3. Bottom: 64-Band Audio-Reactive Harmonic Spectrum Bars
+  const bars=56,barW=(W-80)/bars,baseY=H-54;
+  for(let i=0;i<bars;i++){
+    const env=Math.sin((i/bars)*Math.PI);
+    const h=Math.max(4,(Math.sin(now*0.008+i*0.35)*0.5+0.5)*Math.cos(now*0.004-i*0.2)*52*env+10*env);
+    ctx.fillStyle=i%3===0?'#f4ac5e':'#10b981';
+    ctx.fillRect(40+i*barW,baseY-h,barW-3,h);
+  }
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

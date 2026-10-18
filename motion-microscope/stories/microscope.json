@@ -1,0 +1,80 @@
+{
+  "id": "microscope",
+  "title": "One Fox. Four Ways to See a Walk.",
+  "duration": 48,
+  "fps": 30,
+  "chapters": [
+    {
+      "id": "meet-the-rig",
+      "start": 0,
+      "end": 8,
+      "kicker": "SUPPLIED RIG",
+      "title": "Start with the actual character",
+      "body": "Mesh2Motion fox · 49 bones · 14 clips · Walk",
+      "narrationParts": [
+        "Meet the supplied Mesh2Motion fox, with forty-nine bones and fourteen animation clips.",
+        "We're inspecting its walk, not creating a new rig."
+      ]
+    },
+    {
+      "id": "four-views",
+      "start": 8,
+      "end": 16,
+      "kicker": "SAME MOMENT",
+      "title": "Four views, one walk",
+      "body": "Surface · Mesh · Skeleton · Side/Profile",
+      "narrationParts": [
+        "One moment, four useful views: surface, mesh, skeleton, and side profile.",
+        "They show the same walk, each revealing something different."
+      ]
+    },
+    {
+      "id": "slow-the-walk",
+      "start": 16,
+      "end": 24,
+      "kicker": "SLOW MOTION",
+      "title": "Follow the bend",
+      "body": "Compare the same pose across all four panels.",
+      "narrationParts": [
+        "Now slow the walk and follow how the legs bend.",
+        "Watch the same pose across all four views before judging it."
+      ]
+    },
+    {
+      "id": "freeze-resume",
+      "start": 24,
+      "end": 32,
+      "kicker": "FREEZE, THEN RESUME",
+      "title": "Hold a useful moment",
+      "body": "Pose freezes at 24 seconds; playback resumes at 28.",
+      "narrationParts": [
+        "Pause here, and compare the pose in each panel.",
+        "Then let the walk resume, keeping your eye on the changing silhouette."
+      ]
+    },
+    {
+      "id": "read-the-structure",
+      "start": 32,
+      "end": 40,
+      "kicker": "LOOK CLOSER",
+      "title": "Surface and structure",
+      "body": "Use the mesh and skeleton to inspect the visible bend.",
+      "narrationParts": [
+        "The mesh shows the surface structure; the skeleton shows the moving joints.",
+        "Use both to spot bends that deserve a closer look."
+      ]
+    },
+    {
+      "id": "review-the-cycle",
+      "start": 40,
+      "end": 48,
+      "kicker": "BEFORE THE LONG RENDER",
+      "title": "Review the whole cycle",
+      "body": "Check awkward bends, clipping and the return to the first pose.",
+      "narrationParts": [
+        "Before a longer video, check the full cycle for awkward bends and clipping.",
+        "Four views help inspection; they don't guarantee perfect animation."
+      ]
+    }
+  ]
+}

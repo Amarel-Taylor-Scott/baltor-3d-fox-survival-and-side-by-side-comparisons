@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Without Baltor · Naked Model Loop Without 6-Part Harness</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#14161d;color:#e5e7eb;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+canvas{display:block;width:100vw;height:100vh}
+.hud{display:none!important}
+.err{color:#fca5a5;font-weight:700}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span>Context Rot: <b class="err" id="ctx">94% Bloated</b> · Pass Rate: <b class="err">28.4% Ceiling</b></span>
+</div>
+<canvas id="c"></canvas>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W=800,H=500;
+function rs(){W=canvas.width=window.innerWidth||800;H=canvas.height=window.innerHeight||500;}
+window.addEventListener('resize',rs);rs();
+
+let t=0;
+function loop(){
+  t+=0.016;
+  ctx.fillStyle='#14161d';ctx.fillRect(0,0,W,H);
+  const cx=W*0.5,cy=H*0.46;
+
+  // Spinning retry doom-loop
+  ctx.strokeStyle='rgba(239,68,68,0.35)';ctx.lineWidth=6;
+  ctx.beginPath();ctx.arc(cx,cy,95,0,Math.PI*2);ctx.stroke();
+  ctx.strokeStyle='#ef4444';ctx.lineWidth=6;
+  ctx.beginPath();ctx.arc(cx,cy,95,t*2.2,t*2.2+2.4);ctx.stroke();
+
+  ctx.fillStyle='#f8fafc';ctx.font='700 13px monospace';ctx.textAlign='center';
+  ctx.fillText('NAKED MODEL LOOP',cx,cy-8);
+  ctx.fillStyle='#fca5a5';ctx.font='10.5px monospace';
+  ctx.fillText('while(not_done) { call_llm(); }',cx,cy+12);
+
+  const issues=[
+    '1. Dumps 50,000 raw source tokens into prompt window',
+    '2. Regenerates working code from scratch & breaks edges',
+    '3. Zero deterministic verifier or visual acceptance gate',
+    '4. Upgrading model alone hits 28% ceiling without harness'
+  ];
+  issues.forEach((line,i)=>{
+    ctx.fillStyle='#9ca3af';ctx.font='11px monospace';
+    ctx.fillText(line,cx,cy+135+i*20);
+  });
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

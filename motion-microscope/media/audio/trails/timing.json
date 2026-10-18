@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "storyId": "trails",
+  "duration": 48,
+  "sampleRate": 24000,
+  "timingMethod": "measured-synthesized-sentence-boundaries",
+  "wordAligned": false,
+  "words": [],
+  "cues": [
+    {
+      "text": "Watch the supplied fox run, using its existing animation.",
+      "start": 0.2,
+      "end": 3.570667,
+      "chapterId": "meet-the-run",
+      "chapter": 0,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Four synchronized views reveal different aspects of the same moving pose.",
+      "start": 3.710667,
+      "end": 7.678667,
+      "chapterId": "meet-the-run",
+      "chapter": 0,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Mint tracks the front foot; apricot tracks the tail in profile.",
+      "start": 8.2,
+      "end": 11.592,
+      "chapterId": "read-the-trails",
+      "chapter": 1,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Each trail shows where that bone was a moment ago.",
+      "start": 11.732,
+      "end": 14.142667,
+      "chapterId": "read-the-trails",
+      "chapter": 1,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Slow the run and watch how the two paths curve.",
+      "start": 16.2,
+      "end": 18.290667,
+      "chapterId": "slow-the-run",
+      "chapter": 2,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Match those lines to the legs and tail in each view.",
+      "start": 18.430667,
+      "end": 20.990667,
+      "chapterId": "slow-the-run",
+      "chapter": 2,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Freeze here and look at the shape of each path.",
+      "start": 24.2,
+      "end": 26.226667,
+      "chapterId": "freeze-resume-trails",
+      "chapter": 3,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Then watch the run start again as both trails move on.",
+      "start": 26.366667,
+      "end": 29.204,
+      "chapterId": "freeze-resume-trails",
+      "chapter": 3,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "The fox runs in place, so these lines do not show real travel.",
+      "start": 32.2,
+      "end": 35.826667,
+      "chapterId": "read-with-care",
+      "chapter": 4,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "They track bones, not footprints or ground forces.",
+      "start": 35.966667,
+      "end": 38.462667,
+      "chapterId": "read-with-care",
+      "chapter": 4,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Use the trail to find a moment, then inspect that pose in each view.",
+      "start": 40.2,
+      "end": 43.912,
+      "chapterId": "inspect-the-moment",
+      "chapter": 5,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "One clue can guide the next check.",
+      "start": 44.052,
+      "end": 45.588,
+      "chapterId": "inspect-the-moment",
+      "chapter": 5,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    }
+  ],
+  "sentences": [
+    {
+      "text": "Watch the supplied fox run, using its existing animation.",
+      "start": 0.2,
+      "end": 3.570667,
+      "chapterId": "meet-the-run",
+      "chapter": 0,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Four synchronized views reveal different aspects of the same moving pose.",
+      "start": 3.710667,
+      "end": 7.678667,
+      "chapterId": "meet-the-run",
+      "chapter": 0,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Mint tracks the front foot; apricot tracks the tail in profile.",
+      "start": 8.2,
+      "end": 11.592,
+      "chapterId": "read-the-trails",
+      "chapter": 1,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Each trail shows where that bone was a moment ago.",
+      "start": 11.732,
+      "end": 14.142667,
+      "chapterId": "read-the-trails",
+      "chapter": 1,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Slow the run and watch how the two paths curve.",
+      "start": 16.2,
+      "end": 18.290667,
+      "chapterId": "slow-the-run",
+      "chapter": 2,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Match those lines to the legs and tail in each view.",
+      "start": 18.430667,
+      "end": 20.990667,
+      "chapterId": "slow-the-run",
+      "chapter": 2,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Freeze here and look at the shape of each path.",
+      "start": 24.2,
+      "end": 26.226667,
+      "chapterId": "freeze-resume-trails",
+      "chapter": 3,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Then watch the run start again as both trails move on.",
+      "start": 26.366667,
+      "end": 29.204,
+      "chapterId": "freeze-resume-trails",
+      "chapter": 3,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "The fox runs in place, so these lines do not show real travel.",
+      "start": 32.2,
+      "end": 35.826667,
+      "chapterId": "read-with-care",
+      "chapter": 4,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "They track bones, not footprints or ground forces.",
+      "start": 35.966667,
+      "end": 38.462667,
+      "chapterId": "read-with-care",
+      "chapter": 4,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Use the trail to find a moment, then inspect that pose in each view.",
+      "start": 40.2,
+      "end": 43.912,
+      "chapterId": "inspect-the-moment",
+      "chapter": 5,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "One clue can guide the next check.",
+      "start": 44.052,
+      "end": 45.588,
+      "chapterId": "inspect-the-moment",
+      "chapter": 5,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    }
+  ],
+  "phrases": [
+    {
+      "text": "Watch the supplied fox run, using its existing animation.",
+      "start": 0.2,
+      "end": 3.570667,
+      "chapterId": "meet-the-run",
+      "chapter": 0,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Four synchronized views reveal different aspects of the same moving pose.",
+      "start": 3.710667,
+      "end": 7.678667,
+      "chapterId": "meet-the-run",
+      "chapter": 0,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Mint tracks the front foot; apricot tracks the tail in profile.",
+      "start": 8.2,
+      "end": 11.592,
+      "chapterId": "read-the-trails",
+      "chapter": 1,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Each trail shows where that bone was a moment ago.",
+      "start": 11.732,
+      "end": 14.142667,
+      "chapterId": "read-the-trails",
+      "chapter": 1,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Slow the run and watch how the two paths curve.",
+      "start": 16.2,
+      "end": 18.290667,
+      "chapterId": "slow-the-run",
+      "chapter": 2,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Match those lines to the legs and tail in each view.",
+      "start": 18.430667,
+      "end": 20.990667,
+      "chapterId": "slow-the-run",
+      "chapter": 2,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Freeze here and look at the shape of each path.",
+      "start": 24.2,
+      "end": 26.226667,
+      "chapterId": "freeze-resume-trails",
+      "chapter": 3,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Then watch the run start again as both trails move on.",
+      "start": 26.366667,
+      "end": 29.204,
+      "chapterId": "freeze-resume-trails",
+      "chapter": 3,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "The fox runs in place, so these lines do not show real travel.",
+      "start": 32.2,
+      "end": 35.826667,
+      "chapterId": "read-with-care",
+      "chapter": 4,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "They track bones, not footprints or ground forces.",
+      "start": 35.966667,
+      "end": 38.462667,
+      "chapterId": "read-with-care",
+      "chapter": 4,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Use the trail to find a moment, then inspect that pose in each view.",
+      "start": 40.2,
+      "end": 43.912,
+      "chapterId": "inspect-the-moment",
+      "chapter": 5,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "One clue can guide the next check.",
+      "start": 44.052,
+      "end": 45.588,
+      "chapterId": "inspect-the-moment",
+      "chapter": 5,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    }
+  ],
+  "note": "Each whole sentence was synthesized separately. Cues use its actual sample boundaries. No word timing is claimed."
+}

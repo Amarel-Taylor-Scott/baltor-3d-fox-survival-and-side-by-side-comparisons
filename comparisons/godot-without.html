@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Without Baltor · Single-Script Euler Tunneling</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#161922;color:#e2e8f0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+canvas{display:block;width:100vw;height:100vh}
+.hud{display:none!important}
+.err{color:#fca5a5;font-weight:700}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span>Wall Tunnels: <b class="err" id="tunnels">19</b> · Coyote Time: <b class="err">0ms</b> · Scene Tree: <b class="err">1 Monolithic Script</b></span>
+</div>
+<canvas id="c"></canvas>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W=800,H=500;
+function rs(){W=canvas.width=window.innerWidth||800;H=canvas.height=window.innerHeight||500;}
+window.addEventListener('resize',rs);rs();
+
+let tunnels=19,t=0;
+const bullets=[];
+const p={x:90,y:200,vx:4.5,vy:0,grounded:false};
+
+function loop(){
+  t+=0.016;
+  const gY=H-70,wallX=Math.floor(W*0.64);
+  p.x+=p.vx;
+  if(p.x>wallX-50||p.x<60)p.vx*=-1;
+  p.vy+=0.55;p.y+=p.vy;
+  if(p.y+36>=gY){p.y=gY-36;p.vy=0;p.grounded=true;}
+  if(Math.sin(t*3.2)>0.94&&p.grounded){p.vy=-10.5;p.grounded=false;}
+  if(Math.random()<0.08)bullets.push({x:p.x+28,y:p.y+16,vx:46});
+
+  ctx.fillStyle='#161922';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#262b38';ctx.fillRect(0,gY,W,H-gY);
+
+  // Thin 12px wall
+  ctx.fillStyle='#ef4444';ctx.fillRect(wallX,gY-230,12,230);
+  ctx.fillStyle='#fca5a5';ctx.font='11px monospace';
+  ctx.fillText('12px Thin Wall Collider',wallX-48,gY-238);
+
+  // Rigid player box
+  ctx.fillStyle='#f87171';ctx.fillRect(p.x,p.y,28,36);
+
+  // Fast bullets tunnel right through 12px wall because dx=46 > 12px!
+  for(let i=bullets.length-1;i>=0;i--){
+    const b=bullets[i],oldX=b.x;
+    b.x+=b.vx;
+    if(oldX<wallX&&b.x>wallX+12){
+      tunnels++;document.getElementById('tunnels').textContent=tunnels;
+    }
+    ctx.fillStyle='#facc15';ctx.beginPath();ctx.arc(b.x,b.y,5,0,Math.PI*2);ctx.fill();
+    if(b.x>wallX+16&&b.x<wallX+190){
+      ctx.fillStyle='#fca5a5';
+      ctx.fillText('TUNNELED THROUGH WALL (dx=46px > 12px)!',wallX+20,b.y);
+    }
+    if(b.x>W)bullets.splice(i,1);
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#102f32"><meta name="description" content="Foxglade: an original, playable woodland adventure. Gather nine woodland lights, awaken three shrines, and find your way home.">
+  <title>Foxglade · The Living Wood</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23f4ac5e' d='M3 3l12 7L29 3l-3 20-10 7L6 23z'/%3E%3Cpath fill='%23fff1dc' d='M6 17l10 5 10-5-10 13z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    if (location.search.includes('demo') || location.search.includes('embed') || window.self !== window.top) {
+      document.documentElement.classList.add('auto-demo');
+    }
+  </script>
+  <style>
+    html.auto-demo #welcome,
+    html.auto-demo #paused,
+    html.auto-demo #demoLabel,
+    html.auto-demo .topbar .quest,
+    html.auto-demo .bottom .controls,
+    html.auto-demo .touch-controls {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+  </style>
+  <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js"}}</script>
+</head>
+<body>
+  <main id="game" aria-label="Foxglade woodland adventure">
+    <canvas id="world" aria-label="3D fox game. Keyboard controls are listed below." tabindex="0"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <header class="hud topbar">
+      <div class="brand"><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M4 4l13 8L32 4l-4 23-10 6L7 26z" fill="currentColor"/><path d="M8 19l10 6 10-6-10 12z" fill="#173b3a"/><circle cx="12" cy="17" r="1.7" fill="#173b3a"/><circle cx="24" cy="17" r="1.7" fill="#173b3a"/></svg><div>FOXGLADE<small>THE LANTERN WOOD</small></div></div>
+      <div class="quest" aria-live="polite"><span class="eyebrow" id="chapter">A LITTLE LIGHT GOES A LONG WAY</span><strong id="objective">Find the lost woodland lights</strong><span id="objectiveDetail">Gather 3 lights to awaken a shrine.</span></div>
+      <nav class="actions" aria-label="Game settings"><button id="sound" aria-label="Enable sound" title="Sound (M)">♪<span>OFF</span></button><button id="quality" title="Toggle visual quality">HIGH</button><button id="pause" aria-label="Pause game" title="Pause (Esc)">Ⅱ</button><button id="viewMode" title="Camera view (V)"><span id="cameraLabel">FOLLOW</span></button><button id="lightMode" title="Switch golden hour and moonlight">SUN</button><button id="photoMode" title="Photo mode (P)">PHOTO</button></nav>
+    </header>
+    <section class="hud counters" aria-label="Adventure progress"><div class="counter"><span class="spark">✦</span><b id="lights">0<span>/ 9</span></b><small>LIGHTS FOUND</small></div><div class="counter"><span class="shrine-symbol">◇</span><b id="shrines">0<span>/ 3</span></b><small>SHRINES AWAKE</small></div></section>
+    <div class="hud animal-status"><span id="companionStatus">PIP · FOLLOWING</span><div><b id="actionState">IDLE</b><i></i><span id="pounceStatus">POUNCE READY</span></div></div>
+    <div id="demoLabel" hidden>GUIDED GAMEPLAY <span>Real controls. Real game state.</span><button id="takeover">Take over</button></div>
+    <div id="toast" role="status"></div>
+    <div id="interactHint" class="hud hint" hidden><kbd>E</kbd><span>Awaken shrine</span></div>
+    <div id="sniffHint" class="hud scent" hidden><span>SCENT TRAIL</span><b id="scentDistance"></b><i id="scentArrow">↑</i></div>
+    <footer class="hud bottom"><div class="controls"><div><kbd>W A S D</kbd> Move <kbd>SHIFT</kbd> Run <kbd>SPACE</kbd> Jump</div><div><kbd>CTRL</kbd> Sneak <kbd>F</kbd> Pounce <kbd>B</kbd> Call Pip <kbd>T</kbd> Rest</div><div><kbd>E</kbd> Awaken <kbd>Q</kbd> Sniff <kbd>V</kbd> View <kbd>P</kbd> Photo <span class="mouse-help">Drag to look · Scroll to zoom</span></div></div><div class="map-wrap"><canvas id="minimap" width="256" height="256" aria-label="Map of the forest, lights, shrines and companion"></canvas><span>THE LIVING WOOD <b>N ↑</b></span></div></footer>
+    <div class="touch-controls hud" id="touchControls"><div id="stick" aria-label="Movement joystick"><i></i></div><div class="touch-buttons"><button data-input="call" aria-label="Call companion">CALL</button><button data-input="pounce" aria-label="Pounce forward">POUNCE</button><button data-input="sniff" aria-label="Sniff for nearest objective">SNIFF</button><button data-input="interact" aria-label="Awaken shrine">AWAKEN</button><button data-input="sprint" aria-label="Run">RUN</button><button data-input="jump" aria-label="Jump">JUMP</button></div></div>
+    <section id="welcome" class="overlay"><div class="intro-panel"><span class="eyebrow">FOXGLADE / THE LIVING WOOD</span><h1>Small paws.<br><em>A little more wonder.</em></h1><p>Sneak through the ferns. Leap into the light. Explore with Pip, your curious companion, and bring nine wandering lights home.</p><div class="intro-buttons"><button class="primary" id="play" disabled>Growing the forest…</button><button class="secondary" id="watch" disabled>Watch the adventure <span>↗</span></button></div><div class="intro-meta"><span>POUNCE</span><i></i><span>EXPLORE</span><i></i><span>MAKE A FRIEND</span></div><small class="build-note">Local browser prototype · supplied animated fox rig</small><a class="lab-link" href="motion-study.html">Inside the motion lab: real fox footage + estimated pose ↗</a></div><div class="intro-caption"><span>02 / A WOOD SHARED</span><b>You don't have to wander alone.</b></div></section>
+    <section id="paused" class="overlay centered" hidden><div class="dialog"><span class="eyebrow">TAKE A BREATH</span><h2>The forest can wait.</h2><p>Your adventure is paused.</p><button id="resume" class="primary">Keep exploring</button><button id="restart" class="secondary">Start over</button><button id="measuredCadence" class="secondary" disabled>AUTHORED TIMING</button><a class="lab-link" href="motion-study.html" target="_blank" rel="noopener">Inspect the real-video motion study ↗</a><p class="dialog-note">Ctrl: sneak · F: pounce · B: call Pip · T: rest<br>Space: jump · E: awaken · Q: sniff<br>V: camera · P: photo · M: sound<br>Experimental cadence stays disabled if evidence fails.</p></div></section>
+    <div id="photoPanel" hidden><span>PHOTO MODE · TIME FROZEN</span><p>Drag to compose. Scroll to zoom.</p><button id="savePhoto">Save frame</button><button id="leavePhoto">Back to the wood</button></div>
+    <section id="victory" class="overlay centered" hidden><div class="dialog"><span class="eyebrow">THE LIGHT FINDS ITS WAY HOME</span><h2>You brought the<br><em>woodland back to life.</em></h2><p>Nine lights. Three shrines. One little fox.</p><div id="result"></div><button id="explore" class="primary">Stay a little longer</button><button id="again" class="secondary">Another adventure</button></div></section>
+    <div id="failure" role="alert" hidden></div>
+  </main>
+  <script>
+    (function(){
+      var s = location.search || '';
+      if (s.indexOf('demo=1') !== -1 || s.indexOf('embed=1') !== -1 || s.indexOf('demo') !== -1) {
+        document.body.classList.remove('in-intro');
+        document.body.classList.add('started');
+        var w = document.getElementById('welcome');
+        if (w) { w.style.display = 'none'; w.setAttribute('hidden', ''); }
+      }
+    })();
+  </script>
+  <script type="module" src="app.mjs"></script>
+</body></html>

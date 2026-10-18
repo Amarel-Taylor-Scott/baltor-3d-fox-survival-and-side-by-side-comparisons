@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "storyId": "microscope",
+  "duration": 48,
+  "sampleRate": 24000,
+  "timingMethod": "measured-synthesized-sentence-boundaries",
+  "wordAligned": false,
+  "words": [],
+  "cues": [
+    {
+      "text": "Meet the supplied Mesh2Motion fox, with forty-nine bones and fourteen animation clips.",
+      "start": 0.2,
+      "end": 4.893333,
+      "chapterId": "meet-the-rig",
+      "chapter": 0,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "We're inspecting its walk, not creating a new rig.",
+      "start": 5.033333,
+      "end": 7.486667,
+      "chapterId": "meet-the-rig",
+      "chapter": 0,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "One moment, four useful views: surface, mesh, skeleton, and side profile.",
+      "start": 8.2,
+      "end": 12.338667,
+      "chapterId": "four-views",
+      "chapter": 1,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "They show the same walk, each revealing something different.",
+      "start": 12.478667,
+      "end": 15.38,
+      "chapterId": "four-views",
+      "chapter": 1,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Now slow the walk and follow how the legs bend.",
+      "start": 16.2,
+      "end": 18.546667,
+      "chapterId": "slow-the-walk",
+      "chapter": 2,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Watch the same pose across all four views before judging it.",
+      "start": 18.686667,
+      "end": 21.652,
+      "chapterId": "slow-the-walk",
+      "chapter": 2,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Pause here, and compare the pose in each panel.",
+      "start": 24.2,
+      "end": 26.461333,
+      "chapterId": "freeze-resume",
+      "chapter": 3,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Then let the walk resume, keeping your eye on the changing silhouette.",
+      "start": 26.601333,
+      "end": 29.844,
+      "chapterId": "freeze-resume",
+      "chapter": 3,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "The mesh shows the surface structure; the skeleton shows the moving joints.",
+      "start": 32.2,
+      "end": 35.912,
+      "chapterId": "read-the-structure",
+      "chapter": 4,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Use both to spot bends that deserve a closer look.",
+      "start": 36.052,
+      "end": 38.633333,
+      "chapterId": "read-the-structure",
+      "chapter": 4,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Before a longer video, check the full cycle for awkward bends and clipping.",
+      "start": 40.2,
+      "end": 43.784,
+      "chapterId": "review-the-cycle",
+      "chapter": 5,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Four views help inspection; they don't guarantee perfect animation.",
+      "start": 43.924,
+      "end": 47.508,
+      "chapterId": "review-the-cycle",
+      "chapter": 5,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    }
+  ],
+  "sentences": [
+    {
+      "text": "Meet the supplied Mesh2Motion fox, with forty-nine bones and fourteen animation clips.",
+      "start": 0.2,
+      "end": 4.893333,
+      "chapterId": "meet-the-rig",
+      "chapter": 0,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "We're inspecting its walk, not creating a new rig.",
+      "start": 5.033333,
+      "end": 7.486667,
+      "chapterId": "meet-the-rig",
+      "chapter": 0,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "One moment, four useful views: surface, mesh, skeleton, and side profile.",
+      "start": 8.2,
+      "end": 12.338667,
+      "chapterId": "four-views",
+      "chapter": 1,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "They show the same walk, each revealing something different.",
+      "start": 12.478667,
+      "end": 15.38,
+      "chapterId": "four-views",
+      "chapter": 1,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Now slow the walk and follow how the legs bend.",
+      "start": 16.2,
+      "end": 18.546667,
+      "chapterId": "slow-the-walk",
+      "chapter": 2,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Watch the same pose across all four views before judging it.",
+      "start": 18.686667,
+      "end": 21.652,
+      "chapterId": "slow-the-walk",
+      "chapter": 2,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Pause here, and compare the pose in each panel.",
+      "start": 24.2,
+      "end": 26.461333,
+      "chapterId": "freeze-resume",
+      "chapter": 3,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Then let the walk resume, keeping your eye on the changing silhouette.",
+      "start": 26.601333,
+      "end": 29.844,
+      "chapterId": "freeze-resume",
+      "chapter": 3,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "The mesh shows the surface structure; the skeleton shows the moving joints.",
+      "start": 32.2,
+      "end": 35.912,
+      "chapterId": "read-the-structure",
+      "chapter": 4,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Use both to spot bends that deserve a closer look.",
+      "start": 36.052,
+      "end": 38.633333,
+      "chapterId": "read-the-structure",
+      "chapter": 4,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Before a longer video, check the full cycle for awkward bends and clipping.",
+      "start": 40.2,
+      "end": 43.784,
+      "chapterId": "review-the-cycle",
+      "chapter": 5,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Four views help inspection; they don't guarantee perfect animation.",
+      "start": 43.924,
+      "end": 47.508,
+      "chapterId": "review-the-cycle",
+      "chapter": 5,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    }
+  ],
+  "phrases": [
+    {
+      "text": "Meet the supplied Mesh2Motion fox, with forty-nine bones and fourteen animation clips.",
+      "start": 0.2,
+      "end": 4.893333,
+      "chapterId": "meet-the-rig",
+      "chapter": 0,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "We're inspecting its walk, not creating a new rig.",
+      "start": 5.033333,
+      "end": 7.486667,
+      "chapterId": "meet-the-rig",
+      "chapter": 0,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "One moment, four useful views: surface, mesh, skeleton, and side profile.",
+      "start": 8.2,
+      "end": 12.338667,
+      "chapterId": "four-views",
+      "chapter": 1,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "They show the same walk, each revealing something different.",
+      "start": 12.478667,
+      "end": 15.38,
+      "chapterId": "four-views",
+      "chapter": 1,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Now slow the walk and follow how the legs bend.",
+      "start": 16.2,
+      "end": 18.546667,
+      "chapterId": "slow-the-walk",
+      "chapter": 2,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Watch the same pose across all four views before judging it.",
+      "start": 18.686667,
+      "end": 21.652,
+      "chapterId": "slow-the-walk",
+      "chapter": 2,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Pause here, and compare the pose in each panel.",
+      "start": 24.2,
+      "end": 26.461333,
+      "chapterId": "freeze-resume",
+      "chapter": 3,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Then let the walk resume, keeping your eye on the changing silhouette.",
+      "start": 26.601333,
+      "end": 29.844,
+      "chapterId": "freeze-resume",
+      "chapter": 3,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "The mesh shows the surface structure; the skeleton shows the moving joints.",
+      "start": 32.2,
+      "end": 35.912,
+      "chapterId": "read-the-structure",
+      "chapter": 4,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Use both to spot bends that deserve a closer look.",
+      "start": 36.052,
+      "end": 38.633333,
+      "chapterId": "read-the-structure",
+      "chapter": 4,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Before a longer video, check the full cycle for awkward bends and clipping.",
+      "start": 40.2,
+      "end": 43.784,
+      "chapterId": "review-the-cycle",
+      "chapter": 5,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    },
+    {
+      "text": "Four views help inspection; they don't guarantee perfect animation.",
+      "start": 43.924,
+      "end": 47.508,
+      "chapterId": "review-the-cycle",
+      "chapter": 5,
+      "timingMethod": "measured-synthesized-sentence-boundaries"
+    }
+  ],
+  "note": "Each whole sentence was synthesized separately. Cues use its actual sample boundaries. No word timing is claimed."
+}

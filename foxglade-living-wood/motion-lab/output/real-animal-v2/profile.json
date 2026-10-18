@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "status": "blocked",
+  "enabledByDefault": false,
+  "kind": "estimated-2d-timing-profile",
+  "cyclesPerSecond": null,
+  "speedScale": null,
+  "speedScaleRange": [
+    0.75,
+    1.35
+  ],
+  "referenceCyclesPerSecond": 1.5,
+  "referenceCadenceNote": "Authored playback comparison reference, not a measured Mesh2Motion clip cadence.",
+  "quality": {
+    "passingPawSignals": 0,
+    "totalPawSignals": 4,
+    "durationSeconds": 8.96,
+    "torsoCoverage": 1.0,
+    "cadenceSpreadFraction": null,
+    "thresholds": {
+      "confidence": 0.4,
+      "minCoverage": 0.7,
+      "minSeconds": 5.0,
+      "minCycles": 3.0,
+      "minPawSignals": 2,
+      "maxHoldoutNRMSE": 0.85,
+      "minHoldoutImprovement": 0.15,
+      "maxCadenceSpreadFraction": 0.2,
+      "minFrequency": 0.45,
+      "maxFrequency": 3.5
+    },
+    "blockers": [
+      "insufficient-held-out-periodic-paw-signals"
+    ],
+    "visualReview": "pending",
+    "groundTruthLabels": false
+  },
+  "application": {
+    "mode": "clip-cadence-only",
+    "requiresExplicitToggle": true,
+    "skinnedPoseRetargeted": false,
+    "physicsLearned": false
+  },
+  "source": {
+    "video": "sources/fox-walk-22-31.mp4",
+    "videoSha256": "41daba0c56d65defc623cfe89cf8c93e80e77423fb233e52c192091bbdcbbea5",
+    "modelSha256": "1cfd1c86e0d9e5d5f95178bcd95ee9a4e8386a624cd3c57519f27ff58cac7f28",
+    "model": "RTMPose-m AP10K, upstream pretrained 20230206",
+    "startSeconds": 0,
+    "sampleFps": 25.0,
+    "sourceFps": 25.0,
+    "provenanceManifest": "source-manifest.json",
+    "provenanceManifestSha256": "7da1a4ca3e72c21a3074afb8f788593e8bfa1a270272aece6d616f17f3727d4c",
+    "attribution": "Fox footage: Lubo Ondrasko, Red fox (Vulpes vulpes) looking for a mouse (2014), via Wikimedia Commons, CC BY 3.0. Excerpted, muted and transcoded for the Foxglade motion study. https://commons.wikimedia.org/wiki/File:Red_fox_(Vulpes_vulpes)_looking_for_a_mouse.webm | https://creativecommons.org/licenses/by/3.0/",
+    "license": "CC-BY-3.0",
+    "distributorPage": "https://commons.wikimedia.org/wiki/File:Red_fox_(Vulpes_vulpes)_looking_for_a_mouse.webm",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+    "preprocessing": "RGB; ImageNet mean/std; 1.25 padded square affine crop; input 256x256 from ONNX tensor, not stale 192x256 deploy metadata",
+    "bboxMethod": "manual time-keyframes"
+  },
+  "limitations": [
+    "Single-view estimated 2D points, not 3D motion capture.",
+    "Pretrained RTMPose ran inference; its pose network was not retrained here.",
+    "Only Fourier timing parameters were fit locally; no game policy was trained.",
+    "Chronological same-clip holdout is not independent-animal validation.",
+    "Occluded paws may be misidentified, and confidence is not calibrated probability.",
+    "Existing rig clips remain authored animations. No paw contact or bone rotation is derived.",
+    "No physical metres-per-second can be recovered without camera/scale calibration."
+  ]
+}

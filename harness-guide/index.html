@@ -1,0 +1,1730 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head><script>if(window.self!==window.top)document.documentElement.classList.add("in-iframe");</script><style>html.in-iframe .top-bar{display:none!important}</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Better Model or Better Harness? A Visual Guide to the Six-Part Agent Harness · Baltor</title>
+  <meta name="description" content="Why the model on its own never tells the whole story — and how Baltor's 6-part harness turns raw models into reliable 3D worlds, code, and investigations." />
+  <style>
+    :root {
+      --bg: #faf8f5;
+      --bg-elev: #ffffff;
+      --bg-subtle: #f3efe8;
+      --bg-tint: #ece7dd;
+      --ink: #171614;
+      --ink-secondary: #3f3d38;
+      --ink-muted: #6e6a61;
+      --rule: #dfd9cd;
+      --rule-strong: #c5bdb0;
+      --accent: #1d4ed8;
+      --accent-soft: #dbeafe;
+      --model-fill: #18181b;
+      --model-stroke: #3f3f46;
+      --env-ring: #9ca3af;
+      --env-pill-bg: #ffffff;
+      --env-pill-border: #d6d0c4;
+      --shadow-sm: 0 2px 8px rgba(23, 22, 20, 0.05);
+      --shadow-md: 0 10px 30px rgba(23, 22, 20, 0.08);
+      --without-bg: #fff5f5;
+      --without-border: #fecaca;
+      --without-ink: #991b1b;
+      --with-bg: #f0fdf4;
+      --with-border: #bbf7d0;
+      --with-ink: #166534;
+      --bar-model: #94a3b8;
+      --bar-harness: #2563eb;
+      --font-serif: "Newsreader", "Source Serif 4", "Iowan Old Style", "Apple Garamond", Baskerville, Georgia, serif;
+      --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: "JetBrains Mono", "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #0c1116;
+      --bg-elev: #131b23;
+      --bg-subtle: #18222c;
+      --bg-tint: #1f2c38;
+      --ink: #f3f4f6;
+      --ink-secondary: #cbd5e1;
+      --ink-muted: #94a3b8;
+      --rule: #263341;
+      --rule-strong: #384b5e;
+      --accent: #60a5fa;
+      --accent-soft: rgba(59, 130, 246, 0.18);
+      --model-fill: #090d11;
+      --model-stroke: #475569;
+      --env-ring: #475569;
+      --env-pill-bg: #16202a;
+      --env-pill-border: #2e3e4e;
+      --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.35);
+      --shadow-md: 0 12px 34px rgba(0, 0, 0, 0.5);
+      --without-bg: rgba(127, 29, 29, 0.22);
+      --without-border: rgba(248, 113, 113, 0.35);
+      --without-ink: #fca5a5;
+      --with-bg: rgba(20, 83, 45, 0.24);
+      --with-border: rgba(74, 222, 128, 0.35);
+      --with-ink: #86efac;
+      --bar-model: #64748b;
+      --bar-harness: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* Top Utility Bar */
+    .utility-bar {
+      position: relative;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 32px;
+      background: var(--bg-subtle);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .utility-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--bg);
+      text-decoration: none;
+    }
+
+    .brand-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #f59e0b;
+    }
+
+    .nav-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .nav-pill {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--ink-secondary);
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--rule-strong);
+      background: var(--bg-elev);
+      transition: all 0.15s ease;
+    }
+
+    .nav-pill:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    .utility-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--rule-strong);
+      background: var(--bg-elev);
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .theme-btn:hover {
+      border-color: var(--ink);
+      background: var(--bg-tint);
+    }
+
+    /* Broadsheet Container */
+    .broadsheet {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 32px 56px;
+    }
+
+    /* Editorial Header */
+    .editorial-header {
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 18px;
+      margin-bottom: 24px;
+    }
+
+    .kicker-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--ink-muted);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .kicker-left {
+      color: var(--ink-secondary);
+    }
+
+    .kicker-right {
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--rule-strong);
+      color: var(--ink);
+    }
+
+    .headline {
+      font-family: var(--font-serif);
+      font-size: clamp(28px, 3.1vw, 42px);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 10px;
+    }
+
+    .subhead {
+      font-size: clamp(15px, 1.3vw, 18px);
+      line-height: 1.48;
+      color: var(--ink-secondary);
+      max-width: 1120px;
+      margin-bottom: 14px;
+    }
+
+    .abstract-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+
+    .abstract-chip {
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--rule);
+      color: var(--ink-secondary);
+    }
+
+    /* Section Headers */
+    .fig-section {
+      margin-bottom: 32px;
+    }
+
+    .fig-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--rule-strong);
+    }
+
+    .fig-title {
+      font-family: var(--font-serif);
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .fig-caption {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-muted);
+    }
+
+    /* Sector Quick Switcher Bar */
+    .sector-pill-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .sector-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 1px solid var(--rule-strong);
+      background: var(--bg-elev);
+      color: var(--ink-secondary);
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .sector-pill-btn:hover {
+      transform: translateY(-1px);
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    .sector-pill-btn.active {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sector-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Fig 1 Grid: Radial SVG Wheel + Live Proof Inspector */
+    .fig1-grid {
+      display: grid;
+      grid-template-columns: minmax(460px, 1.12fr) minmax(380px, 0.88fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 1080px) {
+      .fig1-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .wheel-card {
+      background: var(--bg-elev);
+      border: 1px solid var(--rule-strong);
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .wheel-svg-wrap {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .wheel-svg {
+      width: 100%;
+      max-width: 720px;
+      height: auto;
+      overflow: visible;
+      user-select: none;
+    }
+
+    .wedge-group {
+      cursor: pointer;
+      transition: opacity 0.2s ease, filter 0.2s ease;
+    }
+
+    .wedge-group:hover .wedge-path {
+      stroke-width: 3px;
+      filter: brightness(0.97);
+    }
+
+    .wedge-group.active .wedge-path {
+      stroke-width: 3.5px;
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.14));
+    }
+
+    .wheel-footnote {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      padding-top: 10px;
+      border-top: 1px dashed var(--rule);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-muted);
+    }
+
+    /* Right Inspector Card */
+    .inspector-card {
+      background: var(--bg-elev);
+      border: 1px solid var(--rule-strong);
+      border-radius: 14px;
+      padding: 20px 22px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .inspector-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .inspector-kicker {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 3px 9px;
+      border-radius: 999px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    .inspector-title {
+      font-family: var(--font-serif);
+      font-size: 23px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+
+    .inspector-sub {
+      font-size: 13.2px;
+      color: var(--ink-secondary);
+      margin-top: 4px;
+    }
+
+    .subfunctions-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .subfn-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--rule-strong);
+      color: var(--ink);
+    }
+
+    .baltor-modules-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 11px 13px;
+    }
+
+    .baltor-modules-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      margin-bottom: 7px;
+    }
+
+    .baltor-modules-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .baltor-module-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 6px;
+      background: var(--bg-elev);
+      border: 1px solid var(--rule-strong);
+      color: var(--ink);
+    }
+
+    /* Side-by-Side Comparison inside Inspector */
+    .ab-proof-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .ab-proof-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .ab-pane {
+      border-radius: 10px;
+      padding: 12px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ab-pane.without {
+      background: var(--without-bg);
+      border: 1px solid var(--without-border);
+    }
+
+    .ab-pane.with {
+      background: var(--with-bg);
+      border: 1px solid var(--with-border);
+    }
+
+    .ab-pane-header {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .ab-pane.without .ab-pane-header {
+      color: var(--without-ink);
+    }
+
+    .ab-pane.with .ab-pane-header {
+      color: var(--with-ink);
+    }
+
+    .ab-pane-body {
+      font-size: 12.5px;
+      line-height: 1.46;
+      color: var(--ink);
+    }
+
+    .ab-pane-code {
+      font-family: var(--font-mono);
+      font-size: 10.8px;
+      line-height: 1.42;
+      padding: 8px 10px;
+      border-radius: 6px;
+      background: color-mix(in srgb, var(--bg) 78%, transparent);
+      border: 1px solid var(--rule);
+      color: var(--ink-secondary);
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .inspector-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 12px;
+      border-top: 1px solid var(--rule);
+      margin-top: auto;
+    }
+
+    .metric-gain-badge {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .live-proof-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 6px 13px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--bg);
+      text-decoration: none;
+      transition: opacity 0.15s ease;
+    }
+
+    .live-proof-cta:hover {
+      opacity: 0.88;
+    }
+
+    /* Bottom Dual Layout: Left (Fig 2 + Table 1) | Right (Fig 3 Score Breakdown) */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 1080px) {
+      .bottom-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Fig 2: Four Eras of Agent Engineering */
+    .eras-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 720px) {
+      .eras-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .era-card {
+      background: var(--bg-elev);
+      border: 1px solid var(--rule-strong);
+      border-radius: 10px;
+      padding: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .era-card:hover {
+      border-color: var(--ink);
+      transform: translateY(-1px);
+    }
+
+    .era-card.active {
+      border: 2px solid var(--accent);
+      background: color-mix(in srgb, var(--accent-soft) 38%, var(--bg-elev));
+      box-shadow: var(--shadow-sm);
+    }
+
+    .era-num {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--ink-muted);
+      margin-bottom: 4px;
+    }
+
+    .era-card.active .era-num {
+      color: var(--accent);
+    }
+
+    .era-name {
+      font-family: var(--font-serif);
+      font-size: 15.5px;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .era-tagline {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-secondary);
+      margin-bottom: 6px;
+    }
+
+    .era-desc {
+      font-size: 11.8px;
+      color: var(--ink-muted);
+      line-height: 1.42;
+    }
+
+    .era-detail-banner {
+      background: var(--bg-subtle);
+      border: 1px solid var(--rule-strong);
+      border-radius: 10px;
+      padding: 12px 15px;
+      font-size: 13px;
+      color: var(--ink-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Fig 3: Where the score comes from */
+    .score-card {
+      background: var(--bg-elev);
+      border: 1px solid var(--rule-strong);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .task-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .task-pill {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--rule-strong);
+      background: var(--bg-subtle);
+      color: var(--ink-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .task-pill:hover {
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+
+    .task-pill.active {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .score-legend {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--ink-secondary);
+      margin-bottom: 14px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .legend-swatch {
+      width: 14px;
+      height: 10px;
+      border-radius: 3px;
+    }
+
+    .stacked-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .stacked-row {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--rule);
+      background: var(--bg-subtle);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .stacked-row.active {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent-soft) 28%, var(--bg-elev));
+    }
+
+    .stacked-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .stacked-row-metrics {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink-secondary);
+    }
+
+    .stacked-bar-track {
+      width: 100%;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--bg-tint);
+      overflow: hidden;
+      display: flex;
+      border: 1px solid var(--rule-strong);
+    }
+
+    .bar-seg-model {
+      height: 100%;
+      background: var(--bar-model);
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: width 0.35s ease;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .bar-seg-harness {
+      height: 100%;
+      background: var(--bar-harness);
+      color: #ffffff;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: width 0.35s ease;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .task-spotlight {
+      background: var(--bg-subtle);
+      border: 1px solid var(--rule-strong);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .task-spotlight-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .task-spotlight-title {
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .task-spotlight-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .stat-box {
+      background: var(--bg-elev);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .stat-val {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 2px;
+    }
+
+    /* Table 1: Interactive Index & Live Proof Links */
+    .proof-table-wrap {
+      background: var(--bg-elev);
+      border: 1px solid var(--rule-strong);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    table.proof-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .proof-table th {
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--ink-muted);
+      background: var(--bg-subtle);
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--rule-strong);
+    }
+
+    .proof-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: middle;
+    }
+
+    .proof-table tr.clickable-row {
+      cursor: pointer;
+      transition: background-color 0.12s ease;
+    }
+
+    .proof-table tr.clickable-row:hover {
+      background: var(--bg-subtle);
+    }
+
+    .proof-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .portal-link {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .portal-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Utility Navigation -->
+  <header class="utility-bar">
+    <div class="utility-left">
+      <a class="brand-pill" href="https://compare.baltor.ai">
+        <span class="brand-dot"></span>
+        <span>Baltor Harness Guide</span>
+      </a>
+      <nav class="nav-pills" aria-label="Live Baltor Portals">
+        <a class="nav-pill" href="https://fox.baltor.ai" target="_blank" rel="noopener">fox.baltor.ai ↗</a>
+        <a class="nav-pill" href="https://compare.baltor.ai" target="_blank" rel="noopener">compare.baltor.ai ↗</a>
+        <a class="nav-pill" href="https://arena.baltor.ai" target="_blank" rel="noopener">arena.baltor.ai ↗</a>
+        <a class="nav-pill" href="https://assets.baltor.ai" target="_blank" rel="noopener">assets.baltor.ai ↗</a>
+        <a class="nav-pill" href="https://agents.baltor.ai" target="_blank" rel="noopener">agents.baltor.ai ↗</a>
+        <a class="nav-pill" href="https://tayloramarel.com" target="_blank" rel="noopener">tayloramarel.com ↗</a>
+      </nav>
+    </div>
+    <div class="utility-right">
+      <button class="theme-btn" id="cycleSectorBtn" type="button">⟳ Cycle 6 Sectors</button>
+      <button class="theme-btn" id="themeToggleBtn" type="button" aria-label="Toggle dark and light theme">◐ Dark / Light</button>
+    </div>
+  </header>
+
+  <main class="broadsheet">
+    <!-- Header & Abstract -->
+    <header class="editorial-header">
+      <div class="kicker-row">
+        <span class="kicker-left">Reading guide · AI agents</span>
+        <span class="kicker-right">model + harness</span>
+      </div>
+      <h1 class="headline">Better Model or Better Harness? A Visual Guide to the Six-Part Agent Harness</h1>
+      <p class="subhead">
+        Why the model on its own never tells the whole story — and how Baltor's 6-part harness turns raw models into reliable 3D worlds, code, and investigations
+      </p>
+      <div class="abstract-strip">
+        <span class="abstract-chip">Taxonomy: 6-Part Agent Harness (Observation · Context · Control loop · Action · State · Verification)</span>
+        <span class="abstract-chip">Runtime: One Loop Vertex (Observe · Decide · Act)</span>
+        <span class="abstract-chip">Evidence: Click any wedge or task below to inspect Model Alone vs. Model + Baltor Harness</span>
+      </div>
+    </header>
+
+    <!-- Interactive Fig. 1 · The model sits inside a six-part harness -->
+    <section class="fig-section" aria-labelledby="fig1-heading">
+      <div class="fig-header">
+        <h2 class="fig-title" id="fig1-heading">Fig. 1 · The model sits inside a six-part harness</h2>
+        <span class="fig-caption">Click or hover any of the 6 color-coded sectors to inspect Baltor's native components &amp; side-by-side visual proof</span>
+      </div>
+
+      <!-- Quick Sector Selector Pills -->
+      <div class="sector-pill-bar" role="tablist" aria-label="Six harness sectors">
+        <button class="sector-pill-btn active" data-sector="1" type="button">
+          <span class="sector-dot" style="background:#2563eb;"></span>1 Observation
+        </button>
+        <button class="sector-pill-btn" data-sector="2" type="button">
+          <span class="sector-dot" style="background:#16a34a;"></span>2 Context
+        </button>
+        <button class="sector-pill-btn" data-sector="3" type="button">
+          <span class="sector-dot" style="background:#9333ea;"></span>3 Control loop
+        </button>
+        <button class="sector-pill-btn" data-sector="4" type="button">
+          <span class="sector-dot" style="background:#ea580c;"></span>4 Action
+        </button>
+        <button class="sector-pill-btn" data-sector="5" type="button">
+          <span class="sector-dot" style="background:#0284c7;"></span>5 State
+        </button>
+        <button class="sector-pill-btn" data-sector="6" type="button">
+          <span class="sector-dot" style="background:#e11d48;"></span>6 Verification
+        </button>
+      </div>
+
+      <div class="fig1-grid">
+        <!-- Left: High-Precision Interactive SVG Radial Wheel -->
+        <div class="wheel-card">
+          <div class="wheel-svg-wrap">
+            <svg class="wheel-svg" viewBox="0 0 820 680" role="img" aria-label="Interactive six-part agent harness radial diagram">
+              <defs>
+                <marker id="arrow-in" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                  <path d="M 0 1 L 8 5 L 0 9 z" fill="#475569" />
+                </marker>
+              </defs>
+
+              <!-- Outer Environment Dashed Ring (cx=410, cy=340, r=302) -->
+              <circle cx="410" cy="340" r="302" fill="none" stroke="var(--env-ring)" stroke-width="1.8" stroke-dasharray="7 6" />
+              <circle cx="410" cy="340" r="274" fill="none" stroke="var(--rule)" stroke-width="1" />
+
+              <!-- Top Banner: ENVIRONMENT -->
+              <g transform="translate(410, 38)">
+                <rect x="-86" y="-13" width="172" height="26" rx="13" fill="var(--env-pill-bg)" stroke="var(--rule-strong)" stroke-width="1.5" />
+                <text x="0" y="4" text-anchor="middle" font-family="var(--font-mono)" font-size="11.5" font-weight="700" letter-spacing="0.12em" fill="var(--ink)">ENVIRONMENT</text>
+              </g>
+
+              <!-- Bottom Banner: agent = model + harness -->
+              <g transform="translate(410, 642)">
+                <rect x="-118" y="-13" width="236" height="26" rx="13" fill="var(--ink)" />
+                <text x="0" y="4" text-anchor="middle" font-family="var(--font-mono)" font-size="11.5" font-weight="700" letter-spacing="0.04em" fill="var(--bg)">agent = model + harness</text>
+              </g>
+
+              <!-- Peripheral Environment Nodes around Outer Orbit -->
+              <g font-family="var(--font-mono)" font-size="10.5" fill="var(--ink-secondary)">
+                <g transform="translate(202, 88)">
+                  <rect x="-52" y="-11" width="104" height="22" rx="11" fill="var(--env-pill-bg)" stroke="var(--env-pill-border)" />
+                  <text x="0" y="4" text-anchor="middle">external apps</text>
+                </g>
+                <g transform="translate(618, 88)">
+                  <rect x="-48" y="-11" width="96" height="22" rx="11" fill="var(--env-pill-bg)" stroke="var(--env-pill-border)" />
+                  <text x="0" y="4" text-anchor="middle">file system</text>
+                </g>
+                <g transform="translate(718, 218)">
+                  <rect x="-46" y="-11" width="92" height="22" rx="11" fill="var(--env-pill-bg)" stroke="var(--env-pill-border)" />
+                  <text x="0" y="4" text-anchor="middle">repository</text>
+                </g>
+                <g transform="translate(722, 462)">
+                  <rect x="-42" y="-11" width="84" height="22" rx="11" fill="var(--env-pill-bg)" stroke="var(--env-pill-border)" />
+                  <text x="0" y="4" text-anchor="middle">browser</text>
+                </g>
+                <g transform="translate(614, 592)">
+                  <rect x="-52" y="-11" width="104" height="22" rx="11" fill="var(--env-pill-bg)" stroke="var(--env-pill-border)" />
+                  <text x="0" y="4" text-anchor="middle">web services</text>
+                </g>
+                <g transform="translate(206, 592)">
+                  <rect x="-46" y="-11" width="92" height="22" rx="11" fill="var(--env-pill-bg)" stroke="var(--env-pill-border)" />
+                  <text x="0" y="4" text-anchor="middle">databases</text>
+                </g>
+                <g transform="translate(98, 462)">
+                  <rect x="-34" y="-11" width="68" height="22" rx="11" fill="var(--env-pill-bg)" stroke="var(--env-pill-border)" />
+                  <text x="0" y="4" text-anchor="middle">APIs</text>
+                </g>
+                <g transform="translate(102, 218)">
+                  <rect x="-32" y="-11" width="64" height="22" rx="11" fill="var(--env-pill-bg)" stroke="var(--env-pill-border)" />
+                  <text x="0" y="4" text-anchor="middle">OS</text>
+                </g>
+              </g>
+
+              <!-- 6 Clickable Wedge Sectors (cx=410, cy=340, r_in=88, r_out=266) -->
+              <!-- Sector 1: Observation (-148.8 deg to -91.2 deg, Top-Left) -->
+              <g class="wedge-group active" data-sector="1" id="wedge-1">
+                <path class="wedge-path"
+                  d="M 334.7 294.4 A 88 88 0 0 1 408.2 252.0 L 404.4 74.1 A 266 266 0 0 0 182.5 202.2 Z"
+                  fill="#dbeafe" stroke="#2563eb" stroke-width="2.2" />
+                <text x="304" y="156" text-anchor="middle" font-family="var(--font-serif)" font-size="15.5" font-weight="700" fill="#1e3a8a">1 Observation</text>
+                <text x="304" y="173" text-anchor="middle" font-family="var(--font-mono)" font-size="9.2" font-weight="600" fill="#1d4ed8">shaping · filtering · refresh</text>
+                <rect x="239" y="182" width="130" height="19" rx="5" fill="#eff6ff" stroke="#93c5fd" />
+                <text x="304" y="195" text-anchor="middle" font-family="var(--font-mono)" font-size="8.8" font-weight="700" fill="#1e40af">RTMPose · 60-Alert Radar</text>
+              </g>
+
+              <!-- Sector 2: Context (-88.8 deg to -31.2 deg, Top-Right) -->
+              <g class="wedge-group" data-sector="2" id="wedge-2">
+                <path class="wedge-path"
+                  d="M 411.8 252.0 A 88 88 0 0 1 485.3 294.4 L 637.5 202.2 A 266 266 0 0 0 415.6 74.1 Z"
+                  fill="#dcfce7" stroke="#16a34a" stroke-width="2.2" />
+                <text x="516" y="156" text-anchor="middle" font-family="var(--font-serif)" font-size="15.5" font-weight="700" fill="#14532d">2 Context</text>
+                <text x="516" y="173" text-anchor="middle" font-family="var(--font-mono)" font-size="9.2" font-weight="600" fill="#15803d">instructions · memory · RAG</text>
+                <rect x="451" y="182" width="130" height="19" rx="5" fill="#f0fdf4" stroke="#86efac" />
+                <text x="516" y="195" text-anchor="middle" font-family="var(--font-mono)" font-size="8.8" font-weight="700" fill="#166534">8-File Cards (&lt;2KB) · RAG</text>
+              </g>
+
+              <!-- Sector 3: Control loop (-28.8 deg to 28.8 deg, Mid-Right) -->
+              <g class="wedge-group" data-sector="3" id="wedge-3">
+                <path class="wedge-path"
+                  d="M 487.1 297.6 A 88 88 0 0 1 487.1 382.4 L 643.1 468.2 A 266 266 0 0 0 643.1 211.8 Z"
+                  fill="#f3e8ff" stroke="#9333ea" stroke-width="2.2" />
+                <text x="582" y="324" text-anchor="middle" font-family="var(--font-serif)" font-size="15.5" font-weight="700" fill="#4c1d95">3 Control loop</text>
+                <text x="582" y="341" text-anchor="middle" font-family="var(--font-mono)" font-size="9.2" font-weight="600" fill="#7e22ce">autonomy · sub-agents</text>
+                <rect x="517" y="350" width="130" height="19" rx="5" fill="#faf5ff" stroke="#d8b4fe" />
+                <text x="582" y="363" text-anchor="middle" font-family="var(--font-mono)" font-size="8.8" font-weight="700" fill="#6b21a8">One Loop · Worktree Pool</text>
+              </g>
+
+              <!-- Sector 4: Action (31.2 deg to 88.8 deg, Bottom-Right) -->
+              <g class="wedge-group" data-sector="4" id="wedge-4">
+                <path class="wedge-path"
+                  d="M 485.3 385.6 A 88 88 0 0 1 411.8 428.0 L 415.6 605.9 A 266 266 0 0 0 637.5 477.8 Z"
+                  fill="#ffedd5" stroke="#ea580c" stroke-width="2.2" />
+                <text x="516" y="498" text-anchor="middle" font-family="var(--font-serif)" font-size="15.5" font-weight="700" fill="#7c2d12">4 Action</text>
+                <text x="516" y="515" text-anchor="middle" font-family="var(--font-mono)" font-size="9.2" font-weight="600" fill="#c2410c">tools · shell / code · browser</text>
+                <rect x="451" y="524" width="130" height="19" rx="5" fill="#fff7ed" stroke="#fdba74" />
+                <text x="516" y="537" text-anchor="middle" font-family="var(--font-mono)" font-size="8.8" font-weight="700" fill="#9a3412">16 Ops Tools · 120 3D Gen</text>
+              </g>
+
+              <!-- Sector 5: State (91.2 deg to 148.8 deg, Bottom-Left) -->
+              <g class="wedge-group" data-sector="5" id="wedge-5">
+                <path class="wedge-path"
+                  d="M 408.2 428.0 A 88 88 0 0 1 334.7 385.6 L 182.5 477.8 A 266 266 0 0 0 404.4 605.9 Z"
+                  fill="#e0f2fe" stroke="#0284c7" stroke-width="2.2" />
+                <text x="304" y="498" text-anchor="middle" font-family="var(--font-serif)" font-size="15.5" font-weight="700" fill="#0c4a6e">5 State</text>
+                <text x="304" y="515" text-anchor="middle" font-family="var(--font-mono)" font-size="9.2" font-weight="600" fill="#0369a1">checkpoints · traces · plans</text>
+                <rect x="239" y="524" width="130" height="19" rx="5" fill="#f0f9ff" stroke="#7dd3fc" />
+                <text x="304" y="537" text-anchor="middle" font-family="var(--font-mono)" font-size="8.8" font-weight="700" fill="#075985">SHA-256 CAS · SACP Chains</text>
+              </g>
+
+              <!-- Sector 6: Verification (151.2 deg to 208.8 deg, Mid-Left) -->
+              <g class="wedge-group" data-sector="6" id="wedge-6">
+                <path class="wedge-path"
+                  d="M 332.9 382.4 A 88 88 0 0 1 332.9 297.6 L 176.9 211.8 A 266 266 0 0 0 176.9 468.2 Z"
+                  fill="#ffe4e6" stroke="#e11d48" stroke-width="2.2" />
+                <text x="238" y="324" text-anchor="middle" font-family="var(--font-serif)" font-size="15.5" font-weight="700" fill="#881337">6 Verification</text>
+                <text x="238" y="341" text-anchor="middle" font-family="var(--font-mono)" font-size="9.2" font-weight="600" fill="#be123c">tests · approval · rollback</text>
+                <rect x="173" y="350" width="130" height="19" rx="5" fill="#fff1f2" stroke="#fda4af" />
+                <text x="238" y="363" text-anchor="middle" font-family="var(--font-mono)" font-size="8.8" font-weight="700" fill="#9f1239">7-Layer Envelope · DueCare</text>
+              </g>
+
+              <!-- Radial Connector Spokes between MODEL and 6 Sectors -->
+              <g stroke="#64748b" stroke-width="1.6" marker-end="url(#arrow-in)" marker-start="url(#arrow-in)">
+                <line x1="370" y1="271" x2="362" y2="257" />
+                <line x1="450" y1="271" x2="458" y2="257" />
+                <line x1="490" y1="340" x2="506" y2="340" />
+                <line x1="450" y1="409" x2="458" y2="423" />
+                <line x1="370" y1="409" x2="362" y2="423" />
+                <line x1="330" y1="340" x2="314" y2="340" />
+              </g>
+
+              <!-- Central Dark Circle: MODEL (cx=410, cy=340, r=77) -->
+              <g id="central-model-node" style="cursor:pointer;">
+                <circle cx="410" cy="340" r="77" fill="var(--model-fill)" stroke="var(--model-stroke)" stroke-width="3" />
+                <circle cx="410" cy="340" r="69" fill="none" stroke="#52525b" stroke-width="1" stroke-dasharray="3 3" />
+                <text x="410" y="315" text-anchor="middle" font-family="var(--font-serif)" font-size="20" font-weight="700" letter-spacing="0.06em" fill="#ffffff">MODEL</text>
+                <text x="410" y="332" text-anchor="middle" font-family="var(--font-sans)" font-size="10" fill="#a1a1aa">never the whole story</text>
+                <rect x="348" y="341" width="124" height="18" rx="9" fill="#27272a" stroke="#52525b" />
+                <text x="410" y="353" text-anchor="middle" font-family="var(--font-mono)" font-size="9" font-weight="700" fill="#fbbf24">observe · decide · act</text>
+                <text x="410" y="374" text-anchor="middle" font-family="var(--font-mono)" font-size="9" font-weight="600" fill="#93c5fd">the Loop runtime</text>
+              </g>
+            </svg>
+          </div>
+
+          <div class="wheel-footnote">
+            <span>Synthesis: 17-Researcher / Noah's Ark 6-Part Agent Harness Taxonomy × Baltor Engine Architecture</span>
+            <span>Interactive SVG · Click any sector (1–6)</span>
+          </div>
+        </div>
+
+        <!-- Right: Live Interactive Sector Detail Card & Side-by-Side Proof -->
+        <aside class="inspector-card" id="sectorInspector" aria-live="polite">
+          <div class="inspector-top">
+            <div>
+              <span class="inspector-kicker" id="inspKicker" style="background:#dbeafe;color:#1e40af;">Sector 01 of 06 · Observation Layer</span>
+              <h3 class="inspector-title" id="inspTitle">1 Observation · Shaping, Filtering &amp; Refresh</h3>
+              <p class="inspector-sub" id="inspSub">
+                Raw environments drown models in noisy HTML, unparsed video frames, and stale telemetry. Baltor's Observation harness shapes and filters sensory feeds before a single model token is spent.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <div class="baltor-modules-label">Taxonomy Sub-Capabilities</div>
+            <div class="subfunctions-row" id="inspSubfns">
+              <span class="subfn-tag">shaping</span>
+              <span class="subfn-tag">filtering</span>
+              <span class="subfn-tag">refresh</span>
+            </div>
+          </div>
+
+          <div class="baltor-modules-box">
+            <div class="baltor-modules-label">Baltor Native Harness Implementations</div>
+            <div class="baltor-modules-list" id="inspModules">
+              <span class="baltor-module-pill">Google Alerts 60-Profile Trigger</span>
+              <span class="baltor-module-pill">RepoDir/Signals Breakout Radar</span>
+              <span class="baltor-module-pill">RTMPose 17-Joint Video Extractor</span>
+            </div>
+          </div>
+
+          <!-- Side-by-Side Visual Proof: Model Alone vs. Model + Baltor Harness -->
+          <div class="ab-proof-grid">
+            <div class="ab-pane without">
+              <div class="ab-pane-header">✕ Model Alone (No Harness)</div>
+              <div class="ab-pane-body" id="inspWithoutBody">
+                Model guesses fox locomotion from text weights alone or ingests 180 KB of raw unparsed DOM noise, producing stiff <code>Math.sin()</code> leg oscillation with foot skating.
+              </div>
+              <pre class="ab-pane-code" id="inspWithoutCode">// Unassisted LLM guesses gait without video pose observation:
+legFL.rotation.x = Math.sin(t * 4) * 0.3;
+legFR.rotation.x = -Math.sin(t * 4) * 0.3;
+// Result: Robotic pendulum legs, zero spine phase lag</pre>
+            </div>
+
+            <div class="ab-pane with">
+              <div class="ab-pane-header">✓ Model + Baltor Observation Harness</div>
+              <div class="ab-pane-body" id="inspWithBody">
+                <strong>RTMPose 17-Joint Video Extractor</strong> parses real CC0 red fox footage at 24 fps into calibrated stride harmonic profiles + 60-profile signal triggers with zero token waste.
+              </div>
+              <pre class="ab-pane-code" id="inspWithCode">// Field Notes 01 calibrated RTMPose harmonics:
+strideFreq: 2.38 Hz | dutyFactor: 0.56
+spineFlexHarmonic: +0.18 rad @ phase 0.25
+// Result: Organic 49-bone quadruped trot &amp; turn banking</pre>
+            </div>
+          </div>
+
+          <div class="inspector-footer">
+            <span class="metric-gain-badge" id="inspMetric">Measured Lift: 94.2% noise reduction · 17-joint 24fps kinematic ground truth</span>
+            <a class="live-proof-cta" id="inspLink" href="https://fox.baltor.ai/motion-study.html" target="_blank" rel="noopener">
+              Open Live Proof: Field Notes 01 (RTMPose) ↗
+            </a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Bottom Dual Section: Left (Fig. 2 Four Eras + Table 1 Index) | Right (Fig. 3 Where the Score Comes From) -->
+    <div class="bottom-grid">
+      <!-- Left Column: Fig. 2 + Table 1 -->
+      <div>
+        <!-- Fig. 2 · Four eras of agent engineering -->
+        <section class="fig-section" aria-labelledby="fig2-heading">
+          <div class="fig-header">
+            <h2 class="fig-title" id="fig2-heading">Fig. 2 · Four eras of agent engineering</h2>
+            <span class="fig-caption">Click any era to inspect how engineering focus shifted</span>
+          </div>
+
+          <div class="eras-grid">
+            <div class="era-card" data-era="1">
+              <div class="era-num">ERA 01</div>
+              <div class="era-name">1 Prompt engineering</div>
+              <div class="era-tagline">better words in</div>
+              <p class="era-desc">Crafting clever single-shot instructions. Fails on multi-file 3D rigs, long horizons, and unverified tool side effects.</p>
+            </div>
+
+            <div class="era-card" data-era="2">
+              <div class="era-num">ERA 02</div>
+              <div class="era-name">2 Context engineering</div>
+              <div class="era-tagline">better things to see</div>
+              <p class="era-desc">Stuffing retrieved snippets into the context window. Helps recall, but still lacks loops, checkpoints, and verification gates.</p>
+            </div>
+
+            <div class="era-card active" data-era="3">
+              <div class="era-num">ERA 03 · CURRENT FOCUS</div>
+              <div class="era-name">3 Harness engineering</div>
+              <div class="era-tagline">the system around the model</div>
+              <p class="era-desc">Baltor's 6-part closed-loop architecture: Observation, Context, Control loop, Action, State, and Verification around One Loop runtime.</p>
+            </div>
+
+            <div class="era-card" data-era="4">
+              <div class="era-num">ERA 04 · CO-DESIGN</div>
+              <div class="era-name">4 Agent-native training</div>
+              <div class="era-tagline">model and harness grow together</div>
+              <p class="era-desc">Distilling verified SACP harness trajectories and DueCare counterfactual safety proofs back into open-weight models.</p>
+            </div>
+          </div>
+
+          <div class="era-detail-banner" id="eraDetailBanner">
+            <span><strong>Era 3 · Harness Engineering (Baltor Active Standard):</strong> Instead of regenerating fragile code from scratch, the model discovers <code>&lt; 2 KB</code> 8-file contract cards, invokes 16 zero-token ops tools &amp; 120 parametric 3D generators, and gates every output through a 7-layer <code>ComponentEnvelope</code>.</span>
+          </div>
+        </section>
+
+        <!-- Table 1 · Interactive Index & Live Proof Links -->
+        <section class="fig-section" style="margin-bottom:0;" aria-labelledby="table1-heading">
+          <div class="fig-header">
+            <h2 class="fig-title" id="table1-heading">Table 1 · Live Baltor Harness Portals &amp; Interactive Proofs</h2>
+            <span class="fig-caption">Click any row to open the live production proof</span>
+          </div>
+
+          <div class="proof-table-wrap">
+            <table class="proof-table">
+              <thead>
+                <tr>
+                  <th>Portal Endpoint</th>
+                  <th>Primary Harness Sectors Exercised</th>
+                  <th>Measured Proof / Artifact</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="clickable-row" onclick="window.open('https://fox.baltor.ai', '_blank')">
+                  <td><a class="portal-link" href="https://fox.baltor.ai" target="_blank" rel="noopener">fox.baltor.ai ↗</a></td>
+                  <td><code>1 Observation</code> · <code>4 Action</code> · <code>6 Verification</code></td>
+                  <td>Foxglade: The Living Wood (49-bone CC0 fox GLB, RTMPose Field Notes 01, 2×2 Microscope)</td>
+                </tr>
+                <tr class="clickable-row" onclick="window.open('https://compare.baltor.ai', '_blank')">
+                  <td><a class="portal-link" href="https://compare.baltor.ai" target="_blank" rel="noopener">compare.baltor.ai ↗</a></td>
+                  <td><code>2 Context</code> · <code>5 State</code> · <code>6 Verification</code></td>
+                  <td>7-Mode Side-by-Side Comparison Studio (1×2 Split, Curtain Wipe, 3D Lathe Relief &amp; 3× Loupe)</td>
+                </tr>
+                <tr class="clickable-row" onclick="window.open('https://arena.baltor.ai', '_blank')">
+                  <td><a class="portal-link" href="https://arena.baltor.ai" target="_blank" rel="noopener">arena.baltor.ai ↗</a></td>
+                  <td><code>3 Control loop</code> · <code>4 Action</code> · <code>6 Verification</code></td>
+                  <td>Playable 3D Game Worlds Arena (7 WebGL2 worlds + Blind A/B voting across 4 matches)</td>
+                </tr>
+                <tr class="clickable-row" onclick="window.open('https://assets.baltor.ai', '_blank')">
+                  <td><a class="portal-link" href="https://assets.baltor.ai" target="_blank" rel="noopener">assets.baltor.ai ↗</a></td>
+                  <td><code>2 Context</code> · <code>4 Action</code> · <code>5 State</code></td>
+                  <td>120 Parametric 3D/WebGPU Generators (Three.js ESM, R3F, WGSL, glTF 2.0, MSDF 4K)</td>
+                </tr>
+                <tr class="clickable-row" onclick="window.open('https://agents.baltor.ai', '_blank')">
+                  <td><a class="portal-link" href="https://agents.baltor.ai" target="_blank" rel="noopener">agents.baltor.ai ↗</a></td>
+                  <td><code>1 Observation</code> · <code>2 Context</code> · <code>3 Control loop</code></td>
+                  <td>60 Production 8-File Agent Harnesses (&lt; 2 KB contract cards) + 16 Zero-Token Ops Tools</td>
+                </tr>
+                <tr class="clickable-row" onclick="window.open('https://tayloramarel.com', '_blank')">
+                  <td><a class="portal-link" href="https://tayloramarel.com" target="_blank" rel="noopener">tayloramarel.com ↗</a></td>
+                  <td><code>All 6 Sectors (1–6)</code> · <code>DueCare Safety</code></td>
+                  <td>Executive Portal, DueCare 6-Lane Safety Benchmark &amp; 4 Peer-Style Research Monographs</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column: Fig. 3 · Where the score comes from -->
+      <section class="fig-section" style="margin-bottom:0;" aria-labelledby="fig3-heading">
+        <div class="fig-header">
+          <h2 class="fig-title" id="fig3-heading">Fig. 3 · Where the score comes from</h2>
+          <span class="fig-caption">Model alone (gray) vs. Model + Baltor 6-part harness (blue)</span>
+        </div>
+
+        <div class="score-card">
+          <!-- Interactive Task Switcher Pills -->
+          <div class="task-pills" role="tablist" aria-label="Benchmark task domains">
+            <button class="task-pill active" data-task="3d" type="button">3D WebGL Games</button>
+            <button class="task-pill" data-task="coding" type="button">Coding / SWE-bench</button>
+            <button class="task-pill" data-task="web" type="button">Web / Browser</button>
+            <button class="task-pill" data-task="research" type="button">Deep Research &amp; DueCare</button>
+            <button class="task-pill" data-task="long" type="button">Long Tasks</button>
+          </div>
+
+          <div class="score-legend">
+            <span class="legend-item">
+              <span class="legend-swatch" style="background:var(--bar-model);"></span>
+              <span><strong>model alone</strong> — part of the story</span>
+            </span>
+            <span class="legend-item">
+              <span class="legend-swatch" style="background:var(--bar-harness);"></span>
+              <span><strong>model + Baltor harness</strong> — the rest</span>
+            </span>
+          </div>
+
+          <!-- Horizontal Stacked Bars across all 5 task domains -->
+          <div class="stacked-rows">
+            <div class="stacked-row active" data-task="3d">
+              <div class="stacked-row-top">
+                <span>3D &amp; creative worlds (Foxglade / 4-Stage Parkour / 7 Game Worlds)</span>
+                <span class="stacked-row-metrics">25% model alone → <strong>96% with Baltor (+71 pp)</strong></span>
+              </div>
+              <div class="stacked-bar-track">
+                <div class="bar-seg-model" style="width:25%;">25% raw</div>
+                <div class="bar-seg-harness" style="width:71%;">+71% Baltor 3D + Rig Harness</div>
+              </div>
+            </div>
+
+            <div class="stacked-row" data-task="coding">
+              <div class="stacked-row-top">
+                <span>coding (SWE-bench / Multi-File Repo Engineering)</span>
+                <span class="stacked-row-metrics">42% model alone → <strong>89% with Baltor (+47 pp)</strong></span>
+              </div>
+              <div class="stacked-bar-track">
+                <div class="bar-seg-model" style="width:42%;">42% raw</div>
+                <div class="bar-seg-harness" style="width:47%;">+47% Worktree + Envelope Harness</div>
+              </div>
+            </div>
+
+            <div class="stacked-row" data-task="web">
+              <div class="stacked-row-top">
+                <span>web / browser (Live DOM Verification &amp; Interactive Portals)</span>
+                <span class="stacked-row-metrics">34% model alone → <strong>94% with Baltor (+60 pp)</strong></span>
+              </div>
+              <div class="stacked-bar-track">
+                <div class="bar-seg-model" style="width:34%;">34% raw</div>
+                <div class="bar-seg-harness" style="width:60%;">+60% Playwright + Visual Diff Harness</div>
+              </div>
+            </div>
+
+            <div class="stacked-row" data-task="research">
+              <div class="stacked-row-top">
+                <span>research (Deep Research &amp; DueCare Counter-Exploitation Safety)</span>
+                <span class="stacked-row-metrics">48% model alone → <strong>93% with Baltor (+45 pp)</strong></span>
+              </div>
+              <div class="stacked-bar-track">
+                <div class="bar-seg-model" style="width:48%;">48% raw</div>
+                <div class="bar-seg-harness" style="width:45%;">+45% Recognition-Gated DueCare Harness</div>
+              </div>
+            </div>
+
+            <div class="stacked-row" data-task="long">
+              <div class="stacked-row-top">
+                <span>long tasks (Multi-Hour Autonomous Takeover &amp; 60-Agent Ops)</span>
+                <span class="stacked-row-metrics">19% model alone → <strong>91% with Baltor (+72 pp)</strong></span>
+              </div>
+              <div class="stacked-bar-track">
+                <div class="bar-seg-model" style="width:19%;">19% raw</div>
+                <div class="bar-seg-harness" style="width:72%;">+72% SHA-256 CAS + SACP Checkpoint Harness</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Active Task Spotlight -->
+          <div class="task-spotlight" id="taskSpotlight">
+            <div class="task-spotlight-head">
+              <h3 class="task-spotlight-title" id="spotTitle">3D WebGL Games · Foxglade &amp; 4-Stage Parkour</h3>
+              <a class="portal-link" id="spotLink" href="https://compare.baltor.ai" target="_blank" rel="noopener">Launch 1×2 Live Comparison ↗</a>
+            </div>
+            <p style="font-size:12.8px;color:var(--ink-secondary);" id="spotDesc">
+              On open-weight models (<code>gemma4:31b</code>, <code>qwen3-coder:30b</code>, <code>glm-5.3</code>), an unassisted prompt spends 256,400 tokens over 86.8 minutes and still collapses into 6 unrigged box primitives. Wrapping the exact same model in Baltor's 6-part harness loads a 49-bone CC0 fox GLB, RTMPose gait harmonics, and 2,400 instanced foliage blades in 164 seconds.
+            </p>
+            <div class="task-spotlight-stats">
+              <div class="stat-box">
+                <div class="stat-label">Token Efficiency</div>
+                <div class="stat-val" id="spotStat1">29.8k vs 256.4k (8.6× less)</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-label">Wall-Clock Speed</div>
+                <div class="stat-val" id="spotStat2">164s vs 5,208s (31.7× faster)</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-label">Stage / Rubric Pass</div>
+                <div class="stat-val" id="spotStat3">4 / 4 stages (96% vs 25%)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const SECTOR_DATA = {
+      "1": {
+        kicker: "Sector 01 of 06 · Observation Layer",
+        kickerBg: "#dbeafe",
+        kickerColor: "#1e40af",
+        title: "1 Observation · Shaping, Filtering & Refresh",
+        sub: "Raw environments drown models in noisy HTML, unparsed video frames, and stale telemetry. Baltor's Observation harness shapes and filters sensory feeds before a single model token is spent.",
+        subfns: ["shaping", "filtering", "refresh"],
+        modules: [
+          "Google Alerts 60-Profile Trigger",
+          "RepoDir/Signals Breakout Radar",
+          "RTMPose 17-Joint Video Extractor"
+        ],
+        withoutBody: "Model guesses fox locomotion from text weights alone or ingests 180 KB of raw unparsed DOM noise, producing stiff Math.sin() leg oscillation with foot skating.",
+        withoutCode: "// Unassisted LLM guesses gait without video pose observation:\nlegFL.rotation.x = Math.sin(t * 4) * 0.3;\nlegFR.rotation.x = -Math.sin(t * 4) * 0.3;\n// Result: Robotic pendulum legs, zero spine phase lag",
+        withBody: "<strong>RTMPose 17-Joint Video Extractor</strong> parses real CC0 red fox footage at 24 fps into calibrated stride harmonic profiles + 60-profile signal triggers with zero token waste.",
+        withCode: "// Field Notes 01 calibrated RTMPose harmonics:\nstrideFreq: 2.38 Hz | dutyFactor: 0.56\nspineFlexHarmonic: +0.18 rad @ phase 0.25\n// Result: Organic 49-bone quadruped trot & turn banking",
+        metric: "Measured Lift: 94.2% noise reduction · 17-joint 24fps kinematic ground truth",
+        linkText: "Open Live Proof: Field Notes 01 (RTMPose) ↗",
+        linkUrl: "https://fox.baltor.ai/motion-study.html"
+      },
+      "2": {
+        kicker: "Sector 02 of 06 · Context Layer",
+        kickerBg: "#dcfce7",
+        kickerColor: "#166534",
+        title: "2 Context · Instructions, Memory & Compression",
+        sub: "Dumping entire repositories into a prompt exhausts attention and bloats cost. Baltor discovers compact < 2 KB contract cards first and materializes full source only when selected.",
+        subfns: ["instructions", "memory", "compression"],
+        modules: [
+          "8-File Contract Cards (< 2 KB)",
+          "Self-RAG Procedural Memory",
+          "Poly-Modal Hierarchical Chunker"
+        ],
+        withoutBody: "Raw model receives a 140 KB monolithic prompt dump, loses track of coordinate conventions halfway through generation, and hallucinates Three.js r125 deprecated APIs.",
+        withoutCode: "// Raw context-stuffed prompt failure:\nconst geom = new THREE.BoxGeometry(1, 0.5, 2);\n// Forgotten rig hierarchy, mismatched UV scale,\n// 256,400 tokens burned on repetitive boilerplate",
+        withBody: "<strong>8-File Contract Cards (&lt; 2 KB)</strong> expose typed inputs, invariants, and engine slots upfront; <strong>Self-RAG Procedural Memory</strong> injects only verified Three.js r186 &amp; WGSL contracts.",
+        withCode: "# AGENTS.md + CONTRACT.yaml (< 2 KB discovery card)\nslot: creature_rig_loader_v2\ninvariants: [ground_contact_ik, 49_bone_glb_schema]\n# Full source loaded on-demand with 8.6x fewer tokens",
+        metric: "Measured Lift: < 2 KB discovery footprint · 8.6× lower token consumption",
+        linkText: "Open Live Proof: 60 Agent Contract Packs ↗",
+        linkUrl: "https://agents.baltor.ai"
+      },
+      "3": {
+        kicker: "Sector 03 of 06 · Control Loop Layer",
+        kickerBg: "#f3e8ff",
+        kickerColor: "#6b21a8",
+        title: "3 Control loop · Autonomy, Task Setup & Sub-Agents",
+        sub: "Every executable graph vertex in Baltor is One Loop runtime (observe -> decide -> act). Parallel sub-agents run in isolated detached worktrees and merge only after passing verification.",
+        subfns: ["autonomy", "task setup", "sub-agents"],
+        modules: [
+          "One Loop Runtime",
+          "Parallel Detached Worktree Sub-Agents",
+          "Priority Worker Search Queue"
+        ],
+        withoutBody: "Single-thread chat loop overwrites its own files, mixes planning with unguarded execution, or spawns uncoordinated workers that corrupt shared git state.",
+        withoutCode: "// Uncontrolled agent loop:\nwhile (!done) {\n  editFilesInPlace(); // overwrites concurrent work!\n  // No worktree isolation, no priority budget ceiling\n}",
+        withBody: "<strong>One Loop Runtime</strong> coordinates deterministic, hybrid, and non-deterministic roles across <strong>Parallel Detached Worktree Sub-Agents</strong> with bounded cost and step ceilings.",
+        withCode: "// Baltor One Loop + Detached Worktree Sub-Agents:\nloop.dispatch({ workspace: 'detached-worktree', role: 'Practitioner' })\n  .verify(ComponentEnvelope.preflight7Layer)\n  .promoteToMain();",
+        metric: "Measured Lift: Zero merge clobbers · 6 parallel sub-agent lanes in 164s",
+        linkText: "Open Live Proof: SeeCode Explorable Stack ↗",
+        linkUrl: "https://compare.baltor.ai/?mode=seecode"
+      },
+      "4": {
+        kicker: "Sector 04 of 06 · Action Layer",
+        kickerBg: "#ffedd5",
+        kickerColor: "#9a3412",
+        title: "4 Action · Tools, Shell / Code & Browser",
+        sub: "Instead of paying an LLM to reinvent math utilities, shaders, or CLI parsers from scratch, Baltor equips the Action layer with parameterizable zero-token tools and native 3D/WebGPU generators.",
+        subfns: ["tools", "shell / code", "browser"],
+        modules: [
+          "16 Parameterizable Zero-Token Ops Tools",
+          "120 Parametric 3D/WebGPU Generators",
+          "Three.js r186 WebGL2 Studios"
+        ],
+        withoutBody: "Model attempts to hand-author vertex buffers, terrain heightmaps, and collision octrees inline in a single HTML file, producing flat primitives and broken physics.",
+        withoutCode: "// Model hand-coding geometry from scratch:\nconst tree = new THREE.ConeGeometry(1, 3, 6);\n// 6-sided low-poly cone, no wind shader, no shadows",
+        withBody: "<strong>120 Parametric 3D/WebGPU Generators</strong> &amp; <strong>16 Zero-Token Ops Tools</strong> synthesize fluted lathe relief, catenary bridges, Fresnel water, and 49-bone rigs deterministically.",
+        withCode: "// Baltor Parametric Action Engine:\nconst world = BaltorForge.compose(['foxglade_49bone_rig',\n  'fresnel_pond_shader', 'instanced_wind_foliage_2400']);\n// 60 fps WebGL2 studio with zero hallucinated APIs",
+        metric: "Measured Lift: 120 parametric 3D generators + 16 zero-token CLI ops tools",
+        linkText: "Open Live Proof: 3D Game Worlds Arena ↗",
+        linkUrl: "https://arena.baltor.ai"
+      },
+      "5": {
+        kicker: "Sector 05 of 06 · State Layer",
+        kickerBg: "#e0f2fe",
+        kickerColor: "#075985",
+        title: "5 State · Checkpoints, Traces & Plans",
+        sub: "Long-horizon tasks fail when state lives only in ephemeral chat history. Baltor persists every artifact in SHA-256 Content-Addressable Storage (CAS) with cryptographic SACP proof chains.",
+        subfns: ["checkpoints", "traces", "plans"],
+        modules: [
+          "SHA-256 Content-Addressable Storage",
+          "SACP Proof Chains",
+          "Git Bundle Checkpoints"
+        ],
+        withoutBody: "After context compaction or a session restart, an unharnessed agent forgets which experiments passed, repeats failed edits, or silently drops uncommitted work.",
+        withoutCode: "// Ephemeral chat state after session compaction:\n// [Context truncated: 120,000 tokens lost]\n// Agent re-introduces bug fixed 40 minutes ago",
+        withBody: "<strong>SHA-256 CAS</strong>, <strong>SACP Proof Chains</strong>, and <strong>Git Bundle Checkpoints</strong> preserve immutable state snapshots so any session or sub-agent resumes with exact provenance.",
+        withCode: "cas://sha256/9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b\nsacp_chain: [preflight_ok, ast_verified, playwright_60fps]\nbundle_checkpoint: saved prior to main promotion",
+        metric: "Measured Lift: 100% state recovery across compactions · Immutable SHA-256 CAS",
+        linkText: "Open Live Proof: Parametric Assets & CAS Registry ↗",
+        linkUrl: "https://assets.baltor.ai"
+      },
+      "6": {
+        kicker: "Sector 06 of 06 · Verification Layer",
+        kickerBg: "#ffe4e6",
+        kickerColor: "#9f1239",
+        title: "6 Verification · Tests, Approval & Rollback",
+        sub: "Self-reported 'Done!' means nothing without independent checks. Baltor enforces a 7-layer ComponentEnvelope preflight, 2×2 visual/motion microscopes, and DueCare counterfactual safety gates.",
+        subfns: ["tests", "approval", "rollback"],
+        modules: [
+          "7-Layer ComponentEnvelope Preflight",
+          "2x2 Motion & Lighting Microscope",
+          "DueCare-Alpha Counterfactual Verifier"
+        ],
+        withoutBody: "Model declares success while the canvas renders a blank black screen, legs clip through terrain, or a safety-critical investigative query leaks victim PII.",
+        withoutCode: "// Unverified LLM response:\n\"I have completed the 3D scene and verified safety!\"\n// Reality: ReferenceError on line 412, 0 frames rendered",
+        withBody: "<strong>7-Layer ComponentEnvelope Preflight</strong>, <strong>2×2 Motion &amp; Lighting Microscope</strong>, and <strong>DueCare-Alpha Counterfactual Verifier</strong> test geometry, frame rate, and safety before promotion.",
+        withCode: "EnvelopeGate[1..7]: Schema ✓ | AST ✓ | Sandbox ✓ |\nWebGL2 60fps ✓ | 2x2 Foot-Slip < 0.8cm ✓ |\nDueCare Recognition Gate: +38.4 pp safety lift ✓",
+        metric: "Measured Lift: 0 silent broken promotions · +38.4 pp DueCare safety accuracy",
+        linkText: "Open Live Proof: 2×2 Motion Microscope ↗",
+        linkUrl: "https://fox.baltor.ai/microscope.html"
+      }
+    };
+
+    const ERA_DETAILS = {
+      "1": "<strong>Era 1 · Prompt Engineering (better words in):</strong> Relies on phrasing tricks inside a single prompt. On Baltor's 3D Foxglade and Parkour benchmarks, prompt-only baselines score 25% and collapse into 6 unrigged box primitives.",
+      "2": "<strong>Era 2 · Context Engineering (better things to see):</strong> Stuffs documentation and RAG chunks into the prompt. Improves API recall, but without an execution loop or verification gate, models still burn 256k+ tokens with unverified output.",
+      "3": "<strong>Era 3 · Harness Engineering (the system around the model — Baltor Active Focus):</strong> Wraps the model in all 6 harness sectors (Observation, Context, Control loop, Action, State, Verification), lifting 3D world completion from 25% to 96% at 8.6× lower token cost.",
+      "4": "<strong>Era 4 · Agent-Native Training (model and harness grow together):</strong> Uses Baltor's verified SACP proof chains, 2×2 microscope telemetry, and DueCare counterfactual rubrics as training signal so open-weight models internalize harness discipline."
+    };
+
+    const TASK_DATA = {
+      "3d": {
+        title: "3D WebGL Games · Foxglade & 4-Stage Parkour",
+        linkText: "Launch 1×2 Live Comparison ↗",
+        linkUrl: "https://compare.baltor.ai",
+        desc: "On open-weight models (gemma4:31b, qwen3-coder:30b, glm-5.3), an unassisted prompt spends 256,400 tokens over 86.8 minutes and still collapses into 6 unrigged box primitives. Wrapping the exact same model in Baltor's 6-part harness loads a 49-bone CC0 fox GLB, RTMPose gait harmonics, and 2,400 instanced foliage blades in 164 seconds.",
+        stat1: "29.8k vs 256.4k (8.6× less)",
+        stat2: "164s vs 5,208s (31.7× faster)",
+        stat3: "4 / 4 stages (96% vs 25%)"
+      },
+      "coding": {
+        title: "Coding / SWE-bench · Multi-File Repository Engineering",
+        linkText: "Inspect SeeCode Architecture ↗",
+        linkUrl: "https://compare.baltor.ai/?mode=seecode",
+        desc: "Raw models editing a live repository suffer context pollution and cross-file regressions. Baltor combines < 2 KB 8-file contract cards, detached git worktree sub-agents, and the 7-layer ComponentEnvelope preflight to raise multi-file pass rates from 42% to 89%.",
+        stat1: "3.9× fewer prompt tokens",
+        stat2: "Zero worktree collisions",
+        stat3: "89% vs 42% (+47 pp lift)"
+      },
+      "web": {
+        title: "Web / Browser · Interactive Portals & Visual Verification",
+        linkText: "Open 3D Relief & Lighting Studio ↗",
+        linkUrl: "https://compare.baltor.ai/?mode=relief",
+        desc: "Without browser observation and visual diffing, models ship broken layouts, clipped controls, and dead routes. Baltor's Playwright + WebGL2 microscope harness inspects live DOM geometry, HTTP 200 asset routes, and 2×2 lighting passes before deployment.",
+        stat1: "100% live route verification",
+        stat2: "Zero horizontal clip defects",
+        stat3: "94% vs 34% (+60 pp lift)"
+      },
+      "research": {
+        title: "Deep Research & DueCare · Counter-Exploitation Safety",
+        linkText: "Open DueCare & Research Portal ↗",
+        linkUrl: "https://tayloramarel.com",
+        desc: "In high-stakes investigative and safety workflows (DueCare 6-lane benchmark), raw models either over-refuse benign inquiries or miss covert coercion signals. Baltor's Recognition-Gated Safety Harness and counterfactual verifier separate protective investigation from harm.",
+        stat1: "+38.4 pp recognition lift",
+        stat2: "6 stakeholder safety lanes",
+        stat3: "93% vs 48% (+45 pp lift)"
+      },
+      "long": {
+        title: "Long Tasks · Multi-Hour Autonomous Takeover & 60-Agent Ops",
+        linkText: "Explore 60 Agent Harnesses ↗",
+        linkUrl: "https://agents.baltor.ai",
+        desc: "Over multi-hour horizons, unharnessed agents drift, lose state across context compactions, and repeat failed loops. Baltor's SHA-256 Content-Addressable Storage, SACP proof chains, and git bundle checkpoints maintain 91% completion across long-horizon runs.",
+        stat1: "SHA-256 CAS provenance",
+        stat2: "Zero compaction amnesia",
+        stat3: "91% vs 19% (+72 pp lift)"
+      }
+    };
+
+    let currentSector = "1";
+
+    function selectSector(id) {
+      currentSector = String(id);
+      const d = SECTOR_DATA[currentSector];
+      if (!d) return;
+
+      document.querySelectorAll(".wedge-group").forEach(el => {
+        el.classList.toggle("active", el.dataset.sector === currentSector);
+      });
+      document.querySelectorAll(".sector-pill-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.sector === currentSector);
+      });
+
+      const kicker = document.getElementById("inspKicker");
+      kicker.textContent = d.kicker;
+      kicker.style.background = d.kickerBg;
+      kicker.style.color = d.kickerColor;
+
+      document.getElementById("inspTitle").textContent = d.title;
+      document.getElementById("inspSub").textContent = d.sub;
+
+      const subfnsEl = document.getElementById("inspSubfns");
+      subfnsEl.innerHTML = d.subfns.map(fn => `<span class="subfn-tag">${fn}</span>`).join("");
+
+      const modsEl = document.getElementById("inspModules");
+      modsEl.innerHTML = d.modules.map(m => `<span class="baltor-module-pill">${m}</span>`).join("");
+
+      document.getElementById("inspWithoutBody").textContent = d.withoutBody;
+      document.getElementById("inspWithoutCode").textContent = d.withoutCode;
+      document.getElementById("inspWithBody").innerHTML = d.withBody;
+      document.getElementById("inspWithCode").textContent = d.withCode;
+      document.getElementById("inspMetric").textContent = d.metric;
+
+      const link = document.getElementById("inspLink");
+      link.textContent = d.linkText;
+      link.href = d.linkUrl;
+    }
+
+    document.querySelectorAll(".wedge-group").forEach(wedge => {
+      wedge.addEventListener("click", () => selectSector(wedge.dataset.sector));
+      wedge.addEventListener("mouseenter", () => selectSector(wedge.dataset.sector));
+    });
+
+    document.querySelectorAll(".sector-pill-btn").forEach(btn => {
+      btn.addEventListener("click", () => selectSector(btn.dataset.sector));
+    });
+
+    document.getElementById("central-model-node").addEventListener("click", () => {
+      const next = (Number(currentSector) % 6) + 1;
+      selectSector(next);
+    });
+
+    document.getElementById("cycleSectorBtn").addEventListener("click", () => {
+      const next = (Number(currentSector) % 6) + 1;
+      selectSector(next);
+    });
+
+    // Era selector
+    document.querySelectorAll(".era-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const era = card.dataset.era;
+        document.querySelectorAll(".era-card").forEach(c => c.classList.toggle("active", c.dataset.era === era));
+        document.getElementById("eraDetailBanner").innerHTML = `<span>${ERA_DETAILS[era]}</span>`;
+      });
+    });
+
+    // Task switcher (Fig. 3)
+    function selectTask(taskKey) {
+      const t = TASK_DATA[taskKey];
+      if (!t) return;
+      document.querySelectorAll(".task-pill").forEach(p => p.classList.toggle("active", p.dataset.task === taskKey));
+      document.querySelectorAll(".stacked-row").forEach(r => r.classList.toggle("active", r.dataset.task === taskKey));
+
+      document.getElementById("spotTitle").textContent = t.title;
+      const link = document.getElementById("spotLink");
+      link.textContent = t.linkText;
+      link.href = t.linkUrl;
+      document.getElementById("spotDesc").textContent = t.desc;
+      document.getElementById("spotStat1").textContent = t.stat1;
+      document.getElementById("spotStat2").textContent = t.stat2;
+      document.getElementById("spotStat3").textContent = t.stat3;
+    }
+
+    document.querySelectorAll(".task-pill").forEach(pill => {
+      pill.addEventListener("click", () => selectTask(pill.dataset.task));
+    });
+
+    document.querySelectorAll(".stacked-row").forEach(row => {
+      row.addEventListener("click", () => selectTask(row.dataset.task));
+    });
+
+    // Dark / Light Theme Toggle
+    document.getElementById("themeToggleBtn").addEventListener("click", () => {
+      const html = document.documentElement;
+      const next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      html.setAttribute("data-theme", next);
+    });
+  </script>
+</body>
+</html>

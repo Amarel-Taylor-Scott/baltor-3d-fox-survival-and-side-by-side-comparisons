@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Without Baltor · Static ASCII SPOF Diagram</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#14171f;color:#d1d5db;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;display:flex;flex-direction:column}
+.hud{display:none!important}
+.err{color:#fca5a5;font-weight:700}
+.stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px}
+pre{background:#0b0d12;border:1px solid #374151;border-radius:6px;padding:18px 24px;color:#9ca3af;font-size:12px;line-height:1.5}
+.alert{background:rgba(239,68,68,0.14);border:1px solid rgba(239,68,68,0.45);color:#fca5a5;padding:10px 16px;border-radius:6px;font-size:11.5px;max-width:520px;text-align:center}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span>Backpressure: <b class="err">NONE</b> · Sharding: <b class="err">1 Monolith DB</b> · Failover: <b class="err">HTTP 502</b></span>
+</div>
+<div class="stage">
+  <pre>
++-------------+        +-----------------+        +------------------+
+|   CLIENTS   | -----&gt; |  SINGLE SERVER  | -----&gt; |   PRIMARY SQL    |
+| (Unbounded) |        | (No Rate Limit) |        | (Single Node DB) |
++-------------+        +-----------------+        +------------------+
+                                |
+                                v
+                   [ CASCADING OOM / 502 TIMEOUT ]</pre>
+  <div class="alert">
+    <b>Why One-Shot LLM Systems Design Fails:</b> Draws static 3-box diagrams with zero token-bucket admission control, zero consistent-hash ring partitioning, and no Raft quorum failover simulation.
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+Fox footage: Lubo Ondrasko, "Red fox (Vulpes vulpes) looking for a mouse" (2014).
+Original creator source: https://vimeo.com/99037431
+Downloaded via Wikimedia Commons:
+https://commons.wikimedia.org/wiki/File:Red_fox_(Vulpes_vulpes)_looking_for_a_mouse.webm
+License: Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+https://creativecommons.org/licenses/by/3.0/
+
+Foxglade motion-study changes: 22-31 second excerpt, audio removed, H.264
+transcode, sampled contact sheets. Any later keypoint overlays, motion fitting,
+or retargeting are project modifications, not the creator's original work.
+No creator endorsement is implied. Retain this attribution with redistributed
+footage, derivatives, and the motion-study evidence.
+
+The original recording is not a calibrated capture session. Estimated pose
+tracks are model outputs, not ground truth. Panning, body turns, grass occlusion,
+foreshortening and the short recording limit what can be inferred.

@@ -1,0 +1,187 @@
+{
+  "schemaVersion": 1,
+  "profileStatus": "blocked",
+  "signals": [
+    {
+      "status": "fitted",
+      "cyclesPerSecond": 0.535,
+      "coefficients": [
+        -0.050837930170399316,
+        -0.10244021838416564,
+        -0.006655895847407257,
+        -0.01900461345413684,
+        0.010391053198004312
+      ],
+      "trainCount": 157,
+      "holdoutCount": 68,
+      "splitIndex": 157,
+      "trainRMSE": 0.15484276726916196,
+      "holdoutRMSE": 0.37389675377495984,
+      "holdoutNRMSE": 2.1706075371909006,
+      "constantBaselineRMSE": 0.3511240376462141,
+      "holdoutImprovement": -0.06485661386615504,
+      "amplitudeStd": 0.17225442525590767,
+      "coverage": 1.0,
+      "trainingMethod": "frequency-grid + least-squares two-harmonic regression",
+      "joint": "L_F_Paw",
+      "jointIndex": 7,
+      "coordinate": "torso-relative image X / median torso length",
+      "passes": false
+    },
+    {
+      "status": "fitted",
+      "cyclesPerSecond": 0.45,
+      "coefficients": [
+        -0.5600050292515739,
+        0.014836075672941637,
+        -0.09389340869690974,
+        0.04712521981381067,
+        0.03202821630973972
+      ],
+      "trainCount": 156,
+      "holdoutCount": 68,
+      "splitIndex": 157,
+      "trainRMSE": 0.21068499097143983,
+      "holdoutRMSE": 0.4688990827808678,
+      "holdoutNRMSE": 2.0958764806902948,
+      "constantBaselineRMSE": 0.44262306232301657,
+      "holdoutImprovement": -0.05936432756112375,
+      "amplitudeStd": 0.22372457876259572,
+      "coverage": 0.9955555555555555,
+      "trainingMethod": "frequency-grid + least-squares two-harmonic regression",
+      "joint": "R_F_Paw",
+      "jointIndex": 10,
+      "coordinate": "torso-relative image X / median torso length",
+      "passes": false
+    },
+    {
+      "status": "fitted",
+      "cyclesPerSecond": 0.505,
+      "coefficients": [
+        0.608676216069346,
+        0.07062782942417542,
+        -0.042104871112304154,
+        -0.0022382587218121204,
+        0.024009631286637183
+      ],
+      "trainCount": 157,
+      "holdoutCount": 68,
+      "splitIndex": 157,
+      "trainRMSE": 0.27016439177637025,
+      "holdoutRMSE": 0.19909252967337754,
+      "holdoutNRMSE": 0.7199500288477346,
+      "constantBaselineRMSE": 0.21590741627995994,
+      "holdoutImprovement": 0.07788007886111281,
+      "amplitudeStd": 0.27653659517455825,
+      "coverage": 1.0,
+      "trainingMethod": "frequency-grid + least-squares two-harmonic regression",
+      "joint": "L_B_Paw",
+      "jointIndex": 13,
+      "coordinate": "torso-relative image X / median torso length",
+      "passes": false
+    },
+    {
+      "status": "fitted",
+      "cyclesPerSecond": 0.79,
+      "coefficients": [
+        0.4722614039828046,
+        -0.04559494723886254,
+        -0.03776658155756887,
+        -0.03067849079048772,
+        -0.011649805402300543
+      ],
+      "trainCount": 157,
+      "holdoutCount": 68,
+      "splitIndex": 157,
+      "trainRMSE": 0.16991106214004814,
+      "holdoutRMSE": 0.2932434911908503,
+      "holdoutNRMSE": 1.6608584356194576,
+      "constantBaselineRMSE": 0.29389761735020065,
+      "holdoutImprovement": 0.002225693985708266,
+      "amplitudeStd": 0.17656140035889212,
+      "coverage": 1.0,
+      "trainingMethod": "frequency-grid + least-squares two-harmonic regression",
+      "joint": "R_B_Paw",
+      "jointIndex": 16,
+      "coordinate": "torso-relative image X / median torso length",
+      "passes": false
+    }
+  ],
+  "medianTorsoPixels": 185.08479596390407,
+  "thresholds": {
+    "confidence": 0.4,
+    "minCoverage": 0.7,
+    "minSeconds": 5.0,
+    "minCycles": 3.0,
+    "minPawSignals": 2,
+    "maxHoldoutNRMSE": 0.85,
+    "minHoldoutImprovement": 0.15,
+    "maxCadenceSpreadFraction": 0.2,
+    "minFrequency": 0.45,
+    "maxFrequency": 3.5
+  },
+  "estimatedJointCoverage": {
+    "L_Eye": 1.0,
+    "R_Eye": 1.0,
+    "Nose": 1.0,
+    "Neck": 1.0,
+    "Root of tail": 1.0,
+    "L_Shoulder": 1.0,
+    "L_Elbow": 1.0,
+    "L_F_Paw": 1.0,
+    "R_Shoulder": 1.0,
+    "R_Elbow": 1.0,
+    "R_F_Paw": 0.9955555555555555,
+    "L_Hip": 1.0,
+    "L_Knee": 1.0,
+    "L_B_Paw": 1.0,
+    "R_Hip": 1.0,
+    "R_Knee": 1.0,
+    "R_B_Paw": 1.0
+  },
+  "evaluation": "First 70 percent frequency/coefficients fit; last 30 percent holdout, same clip.",
+  "blockers": [
+    "insufficient-held-out-periodic-paw-signals"
+  ],
+  "framesInferred": 225,
+  "inferenceSeconds": 9.219,
+  "provider": [
+    "CPUExecutionProvider"
+  ],
+  "modelInputShape": [
+    "batch",
+    3,
+    256,
+    256
+  ],
+  "previews": [
+    "overlay-0001.jpg",
+    "overlay-0050.jpg",
+    "overlay-0100.jpg",
+    "overlay-0150.jpg",
+    "overlay-0200.jpg"
+  ],
+  "runtime": {
+    "onnxruntime": "1.31.0",
+    "opencv": "5.0.0",
+    "numpy": "2.3.5"
+  },
+  "visualReview": "pending",
+  "source": {
+    "video": "sources/fox-walk-22-31.mp4",
+    "videoSha256": "41daba0c56d65defc623cfe89cf8c93e80e77423fb233e52c192091bbdcbbea5",
+    "modelSha256": "1cfd1c86e0d9e5d5f95178bcd95ee9a4e8386a624cd3c57519f27ff58cac7f28",
+    "model": "RTMPose-m AP10K, upstream pretrained 20230206",
+    "startSeconds": 0,
+    "sampleFps": 25.0,
+    "sourceFps": 25.0,
+    "provenanceManifest": "source-manifest.json",
+    "provenanceManifestSha256": "7da1a4ca3e72c21a3074afb8f788593e8bfa1a270272aece6d616f17f3727d4c",
+    "attribution": "Fox footage: Lubo Ondrasko, Red fox (Vulpes vulpes) looking for a mouse (2014), via Wikimedia Commons, CC BY 3.0. Excerpted, muted and transcoded for the Foxglade motion study. https://commons.wikimedia.org/wiki/File:Red_fox_(Vulpes_vulpes)_looking_for_a_mouse.webm | https://creativecommons.org/licenses/by/3.0/",
+    "license": "CC-BY-3.0",
+    "distributorPage": "https://commons.wikimedia.org/wiki/File:Red_fox_(Vulpes_vulpes)_looking_for_a_mouse.webm",
+    "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
+    "preprocessing": "RGB; ImageNet mean/std; 1.25 padded square affine crop; input 256x256 from ONNX tensor, not stale 192x256 deploy metadata",
+    "bboxMethod": "manual time-keyframes"
+  }
+}

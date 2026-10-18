@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Without Baltor · Brittle Linear Prompt Chain</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#16141c;color:#e5e7eb;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+canvas{display:block;width:100vw;height:100vh}
+.hud{display:none!important}
+.err{color:#fca5a5;font-weight:700}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span>Typed Edges: <b class="err">0</b> · Engine Fallback: <b class="err">NONE</b> · Downstream Corruption: <b class="err">100%</b></span>
+</div>
+<canvas id="c"></canvas>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W=800,H=500;
+function rs(){W=canvas.width=window.innerWidth||800;H=canvas.height=window.innerHeight||500;}
+window.addEventListener('resize',rs);rs();
+
+const steps=[
+  {title:'PROMPT 1',sub:'"Write 3D code..."',err:'Hallucinates API'},
+  {title:'PROMPT 2',sub:'"Parse raw text..."',err:'JSON Schema Drift'},
+  {title:'PROMPT 3',sub:'"Render output..."',err:'Uncaught TypeError'},
+  {title:'FINAL OUTPUT',sub:'Broken Artifact',err:'Cascading Failure'}
+];
+let t=0;
+function loop(){
+  t+=0.018;
+  ctx.fillStyle='#16141c';ctx.fillRect(0,0,W,H);
+  const cy=H*0.5,startX=W*0.14,endX=W*0.86,stepW=(endX-startX)/(steps.length-1);
+
+  ctx.strokeStyle='#ef4444';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(startX,cy);ctx.lineTo(endX,cy);ctx.stroke();
+
+  // Red corruption pulse propagating linearly with no gate
+  const px=startX+((t*0.35)%1)*(endX-startX);
+  ctx.fillStyle='#f87171';ctx.beginPath();ctx.arc(px,cy,8,0,Math.PI*2);ctx.fill();
+
+  steps.forEach((s,i)=>{
+    const x=startX+i*stepW;
+    ctx.fillStyle='#271722';ctx.strokeStyle='#ef4444';ctx.lineWidth=2;
+    ctx.beginPath();ctx.roundRect(x-68,cy-42,136,84,8);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#f8fafc';ctx.font='700 11px monospace';ctx.textAlign='center';
+    ctx.fillText(s.title,x,cy-14);
+    ctx.fillStyle='#9ca3af';ctx.font='9.5px monospace';
+    ctx.fillText(s.sub,x,cy+4);
+    ctx.fillStyle='#fca5a5';ctx.font='700 9.5px monospace';
+    ctx.fillText('✗ '+s.err,x,cy+24);
+  });
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

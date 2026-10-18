@@ -1,0 +1,80 @@
+{
+  "id": "trails",
+  "title": "Follow the Foot. Read the Tail.",
+  "duration": 48,
+  "fps": 30,
+  "chapters": [
+    {
+      "id": "meet-the-run",
+      "start": 0,
+      "end": 8,
+      "kicker": "SUPPLIED ANIMATION",
+      "title": "One run, four views",
+      "body": "Mesh2Motion fox · Run · Surface / Mesh / Skeleton / Side",
+      "narrationParts": [
+        "Watch the supplied fox run, using its existing animation.",
+        "Four synchronized views reveal different aspects of the same moving pose."
+      ]
+    },
+    {
+      "id": "read-the-trails",
+      "start": 8,
+      "end": 16,
+      "kicker": "POSITION HISTORY",
+      "title": "Two paths to follow",
+      "body": "Mint: front foot · Apricot: tail tip",
+      "narrationParts": [
+        "Mint tracks the front foot; apricot tracks the tail in profile.",
+        "Each trail shows where that bone was a moment ago."
+      ]
+    },
+    {
+      "id": "slow-the-run",
+      "start": 16,
+      "end": 24,
+      "kicker": "SLOW MOTION",
+      "title": "Watch the curves develop",
+      "body": "Paths follow the recent positions of two animated bones.",
+      "narrationParts": [
+        "Slow the run and watch how the two paths curve.",
+        "Match those lines to the legs and tail in each view."
+      ]
+    },
+    {
+      "id": "freeze-resume-trails",
+      "start": 24,
+      "end": 32,
+      "kicker": "FREEZE, THEN RESUME",
+      "title": "Hold the paths still",
+      "body": "The pose and histories freeze together, then continue at 28 seconds.",
+      "narrationParts": [
+        "Freeze here and look at the shape of each path.",
+        "Then watch the run start again as both trails move on."
+      ]
+    },
+    {
+      "id": "read-with-care",
+      "start": 32,
+      "end": 40,
+      "kicker": "WHAT THE LINES MEAN",
+      "title": "A history, not a footprint",
+      "body": "In-place animation paths, not contact forces or real travel.",
+      "narrationParts": [
+        "The fox runs in place, so these lines do not show real travel.",
+        "They track bones, not footprints or ground forces."
+      ]
+    },
+    {
+      "id": "inspect-the-moment",
+      "start": 40,
+      "end": 48,
+      "kicker": "USE THE VIEWS TOGETHER",
+      "title": "Find, pause, compare",
+      "body": "Use profile histories to choose a moment, then inspect all four views.",
+      "narrationParts": [
+        "Use the trail to find a moment, then inspect that pose in each view.",
+        "One clue can guide the next check."
+      ]
+    }
+  ]
+}

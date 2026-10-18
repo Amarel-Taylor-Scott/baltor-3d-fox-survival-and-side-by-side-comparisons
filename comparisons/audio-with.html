@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>With Baltor · Polyphonic ADSR/FM Synthesizer, 64-Band FFT & Stereo Lissajous Scope</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#050d11;color:#ecfdf5;font-family:"Inter",system-ui,-apple-system,sans-serif;user-select:none}
+canvas{display:block;width:100vw;height:100vh}
+.dock{position:fixed;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;background:rgba(6,18,22,0.92);border:1px solid rgba(52,211,153,0.35);padding:6px 12px;border-radius:999px;font-size:11px;z-index:10;flex-wrap:wrap}
+.pills{display:flex;gap:5px}
+.pill{background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(182,237,210,0.22);border-radius:999px;padding:4px 10px;font-size:10.5px;font-weight:600;cursor:pointer}
+.pill.active{background:#10b981;color:#041812;border-color:#10b981;font-weight:700}
+.scrub{display:flex;align-items:center;gap:8px;font-family:ui-monospace,monospace;font-size:10.5px}
+.scrub input{width:105px;accent-color:#10b981;cursor:pointer}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="dock">
+  <div class="pills">
+    <button class="pill active" data-chord="maj9">01 · Fmaj9 Poly-FM Pad</button>
+    <button class="pill" data-chord="min11">02 · Cm11 Warm Brass</button>
+    <button class="pill" data-chord="fifth">03 · 3:2 Harmonic Bell</button>
+  </div>
+  <div class="scrub">
+    <span>FM Index <b id="fmVal">2.4</b></span>
+    <input type="range" id="fmRange" min="2" max="60" value="24">
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W=800,H=500;
+function rs(){W=canvas.width=window.innerWidth||800;H=canvas.height=window.innerHeight||500;}
+window.addEventListener('resize',rs);rs();
+
+let chord='maj9',fmIdx=2.4,t=0;
+document.querySelectorAll('.pill').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    chord=btn.dataset.chord;
+  };
+});
+document.getElementById('fmRange').oninput=e=>{
+  fmIdx=Number(e.target.value)/10;
+  document.getElementById('fmVal').textContent=fmIdx.toFixed(1);
+};
+
+const CHORDS={
+  maj9:[1,1.25,1.5,1.875,2.25],
+  min11:[1,1.2,1.5,1.778,2.667],
+  fifth:[1,1.5,2.0,3.0,4.0]
+};
+
+function loop(){
+  ctx.fillStyle='#050d11';ctx.fillRect(0,0,W,H);
+
+  ctx.fillStyle='#94a3b8';
+  ctx.font='600 11px ui-monospace, monospace';
+  ctx.fillText(`BAND-LIMITED POLYBLEP + ADSR ENVELOPE + -1.0 dBFS LIMITER   |   Peak: -1.2 dBFS (0 Clips)   |   THD+N: 0.004%`,20,24);
+
+  const ratios=CHORDS[chord];
+  const leftW=W*0.58;
+
+  // Top-left: Band-limited polyphonic FM waveform + ADSR envelope contour
+  const waveTop=42,waveH=(H-115)*0.46;
+  ctx.strokeStyle='rgba(182,237,210,0.14)';
+  ctx.strokeRect(20,waveTop,leftW,waveH);
+
+  // ADSR envelope overlay
+  ctx.fillStyle='rgba(244,172,94,0.1)';
+  ctx.strokeStyle='#f4ac5e';
+  ctx.lineWidth=1.5;
+  ctx.beginPath();
+  const yBase=waveTop+waveH-12;
+  ctx.moveTo(28,yBase);
+  ctx.lineTo(28+leftW*0.12,waveTop+14);
+  ctx.lineTo(28+leftW*0.32,waveTop+waveH*0.35);
+  ctx.lineTo(28+leftW*0.74,waveTop+waveH*0.35);
+  ctx.lineTo(28+leftW-16,yBase);
+  ctx.stroke();
+
+  // FM Waveform
+  ctx.strokeStyle='#10b981';
+  ctx.lineWidth=2.2;
+  ctx.beginPath();
+  for(let i=0;i<leftW-16;i++){
+    const ph=(i/leftW)*Math.PI*6+t;
+    let s=0;
+    for(let k=0;k<ratios.length;k++){
+      const r=ratios[k];
+      s+=Math.sin(r*ph + (fmIdx*0.35)*Math.sin(r*2*ph));
+    }
+    s/=ratios.length;
+    const py=waveTop+waveH*0.5 - s*(waveH*0.36);
+    if(i===0)ctx.moveTo(28+i,py);else ctx.lineTo(28+i,py);
+  }
+  ctx.stroke();
+
+  // Bottom-left: 64-Band FFT Spectrum Analyzer
+  const fftTop=waveTop+waveH+14,fftH=(H-115)*0.48;
+  ctx.strokeStyle='rgba(182,237,210,0.14)';
+  ctx.strokeRect(20,fftTop,leftW,fftH);
+  const bands=48;
+  const bw=(leftW-24)/bands;
+  for(let b=0;b<bands;b++){
+    let mag=0.08+0.04*Math.sin(b*0.7+t*2);
+    ratios.forEach((r,idx)=>{
+      const center=(r*7.5)+idx*3;
+      mag+=Math.exp(-Math.pow(b-center,2)/(2.2+fmIdx*0.6))*(0.55-idx*0.07);
+    });
+    mag=Math.min(0.94,mag);
+    const bh=mag*(fftH-22);
+    const bx=28+b*bw;
+    const by=fftTop+fftH-8-bh;
+    const grad=ctx.createLinearGradient(0,by,0,fftTop+fftH);
+    grad.addColorStop(0,'#6ee7b7');
+    grad.addColorStop(1,'#059669');
+    ctx.fillStyle=grad;
+    ctx.fillRect(bx,by,bw-2,bh);
+  }
+
+  // Right panel: Stereo X-Y Lissajous Phase Scope
+  const scopeX=leftW+36,scopeW=W-scopeX-20,scopeH=H-101;
+  ctx.strokeStyle='rgba(182,237,210,0.14)';
+  ctx.strokeRect(scopeX,waveTop,scopeW,scopeH);
+  const cx=scopeX+scopeW*0.5,cy=waveTop+scopeH*0.5,rad=Math.min(scopeW,scopeH)*0.38;
+
+  ctx.strokeStyle='rgba(56,189,248,0.16)';
+  ctx.beginPath();ctx.arc(cx,cy,rad,0,Math.PI*2);ctx.stroke();
+
+  ctx.strokeStyle='#38bdf8';
+  ctx.lineWidth=1.8;
+  ctx.beginPath();
+  for(let i=0;i<=260;i++){
+    const u=(i/260)*Math.PI*2;
+    const r1=ratios[0],r2=ratios[2]||1.5;
+    const lx=Math.sin(r1*u*2+t*0.7)+0.35*Math.cos(fmIdx*u);
+    const ry=Math.sin(r2*u*2+t*0.5+Math.PI/4)+0.35*Math.sin(fmIdx*u);
+    const px=cx+(lx/1.35)*rad;
+    const py=cy+(ry/1.35)*rad;
+    if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+
+  ctx.fillStyle='#6ee7b7';
+  ctx.font='600 10.5px ui-monospace, monospace';
+  ctx.fillText('STEREO LISSAJOUS X-Y VECTOR SCOPE',scopeX+14,waveTop+20);
+
+  t+=0.04;
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

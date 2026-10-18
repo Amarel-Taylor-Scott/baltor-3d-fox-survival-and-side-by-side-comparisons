@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Without Baltor · Raw 2D Survival Canvas</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#1e2621;color:#e2e8f0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;user-select:none}
+canvas{display:block;width:100vw;height:100vh}
+.hud{display:none!important}
+.err{color:#fca5a5;font-weight:700}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span>Broadphase: <b class="err" id="checks">O(N²) = 19,600 checks/frame</b> · Wall Clipping: <b class="err" id="clips">14</b> · Fog-of-War: <b class="err">NONE</b></span>
+</div>
+<canvas id="c"></canvas>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W=800,H=500;
+function rs(){W=canvas.width=window.innerWidth||800;H=canvas.height=window.innerHeight||500;}
+window.addEventListener('resize',rs);rs();
+
+const walls=[
+  {x:0.22,y:0.22,w:0.18,h:0.07},
+  {x:0.58,y:0.20,w:0.06,h:0.32},
+  {x:0.30,y:0.62,w:0.24,h:0.07},
+  {x:0.66,y:0.68,w:0.16,h:0.08}
+];
+const pl={x:0.5,y:0.5,a:0};
+const enemies=Array.from({length:18},(_,i)=>({
+  x:0.12+(i%6)*0.15,
+  y:0.15+Math.floor(i/6)*0.32,
+  vx:(i%2===0?1:-1)*(0.08+i*0.004),
+  vy:(i%3===0?1:-1)*(0.07+i*0.003)
+}));
+const bullets=[];
+let clips=14,lastT=performance.now();
+
+function loop(now){
+  const dt=Math.min(0.05,(now-lastT)/1000);lastT=now;
+  pl.a+=dt*1.3;
+  pl.x=0.5+Math.cos(now*0.0011)*0.16;
+  pl.y=0.5+Math.sin(now*0.0015)*0.14;
+  if(Math.random()<0.14){
+    bullets.push({x:pl.x*W,y:pl.y*H,vx:Math.cos(pl.a)*340,vy:Math.sin(pl.a)*340});
+  }
+
+  ctx.fillStyle='#263328';ctx.fillRect(0,0,W,H);
+  // Naive grid
+  ctx.strokeStyle='rgba(255,255,255,0.05)';
+  for(let x=0;x<W;x+=48){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=48){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // Draw walls (no shadow casting, no collision resolution)
+  walls.forEach(w=>{
+    ctx.fillStyle='#52525b';
+    ctx.fillRect(w.x*W,w.y*H,w.w*W,w.h*H);
+    ctx.strokeStyle='#ef4444';
+    ctx.strokeRect(w.x*W,w.y*H,w.w*W,w.h*H);
+  });
+
+  // O(N^2) pairwise line clutter
+  ctx.strokeStyle='rgba(239,68,68,0.12)';
+  for(let i=0;i<enemies.length;i++){
+    for(let j=i+1;j<enemies.length;j++){
+      ctx.beginPath();
+      ctx.moveTo(enemies[i].x*W,enemies[i].y*H);
+      ctx.lineTo(enemies[j].x*W,enemies[j].y*H);
+      ctx.stroke();
+    }
+  }
+
+  // Enemies clip right through walls & overlap each other
+  enemies.forEach((e,idx)=>{
+    e.x+=e.vx*dt;e.y+=e.vy*dt;
+    if(e.x<0.06||e.x>0.94)e.vx*=-1;
+    if(e.y<0.10||e.y>0.90)e.vy*=-1;
+    const ex=e.x*W,ey=e.y*H;
+    let insideWall=false;
+    walls.forEach(w=>{
+      if(e.x>w.x&&e.x<w.x+w.w&&e.y>w.y&&e.y<w.y+w.h)insideWall=true;
+    });
+    if(insideWall&&Math.random()<0.05){
+      clips++;
+      document.getElementById('clips').textContent=clips;
+    }
+    ctx.fillStyle=insideWall?'#f87171':'#dc2626';
+    ctx.fillRect(ex-12,ey-12,24,24);
+    if(insideWall){
+      ctx.fillStyle='#fef08a';
+      ctx.font='10px monospace';
+      ctx.fillText('WALL CLIP!',ex-24,ey-16);
+    }
+  });
+
+  // Bullets ignore walls
+  for(let i=bullets.length-1;i>=0;i--){
+    const b=bullets[i];
+    b.x+=b.vx*dt;b.y+=b.vy*dt;
+    ctx.fillStyle='#facc15';
+    ctx.fillRect(b.x-4,b.y-4,8,8);
+    if(b.x<0||b.x>W||b.y<0||b.y>H)bullets.splice(i,1);
+  }
+
+  // Player square
+  const px=pl.x*W,py=pl.y*H;
+  ctx.fillStyle='#60a5fa';
+  ctx.fillRect(px-14,py-14,28,28);
+  ctx.strokeStyle='#e2e8f0';ctx.lineWidth=3;
+  ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+Math.cos(pl.a)*24,py+Math.sin(pl.a)*24);ctx.stroke();
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

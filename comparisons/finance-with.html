@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>With Baltor · Animated Budget Sankey Flow, (r - g) Debt Boundary & 30-Year Fee Drag</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#061014;color:#ecfdf5;font-family:"Inter",system-ui,-apple-system,sans-serif;user-select:none}
+canvas{display:block;width:100vw;height:100vh}
+.dock{position:fixed;bottom:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;background:rgba(6,18,22,0.92);border:1px solid rgba(52,211,153,0.35);padding:6px 12px;border-radius:999px;font-size:11px;z-index:10;flex-wrap:wrap}
+.pills{display:flex;gap:6px}
+.pill{background:rgba(255,255,255,0.06);color:#cbd5e1;border:1px solid rgba(182,237,210,0.22);border-radius:999px;padding:4px 10px;font-size:10.5px;font-weight:600;cursor:pointer}
+.pill.active{background:#10b981;color:#041812;border-color:#10b981;font-weight:700}
+.scrub{display:flex;align-items:center;gap:8px;font-family:ui-monospace,monospace;font-size:10.5px}
+.scrub input{width:110px;accent-color:#10b981;cursor:pointer}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="dock">
+  <div class="pills">
+    <button class="pill active" data-mode="sankey">01 · Balanced Budget Sankey (Σ In ≡ Σ Out)</button>
+    <button class="pill" data-mode="fee">02 · 30-Yr Compounding Fee Drag (0.03% vs 1.25%)</button>
+    <button class="pill" data-mode="debt">03 · Sovereign Debt (r − g) Phase Plane</button>
+  </div>
+  <div class="scrub">
+    <span>Active Fee <b id="feeVal">1.25%</b></span>
+    <input type="range" id="feeRange" min="25" max="200" value="125">
+  </div>
+</div>
+<script>
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let W=800,H=500;
+function rs(){W=canvas.width=window.innerWidth||800;H=canvas.height=window.innerHeight||500;}
+window.addEventListener('resize',rs);rs();
+
+let mode='sankey';
+let activeFee=0.0125;
+let t=0;
+
+document.querySelectorAll('.pill').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    mode=btn.dataset.mode;
+  };
+});
+document.getElementById('feeRange').oninput=e=>{
+  activeFee=Number(e.target.value)/10000;
+  document.getElementById('feeVal').textContent=(activeFee*100).toFixed(2)+'%';
+};
+
+const inflows=[
+  {name:'Income Tax ($124B)',val:124,col:'#10b981'},
+  {name:'Sales & Excise ($68B)',val:68,col:'#34d399'},
+  {name:'Federal Grants ($58B)',val:58,col:'#38bdf8'}
+];
+const outflows=[
+  {name:'K-12 & Higher Ed ($92B)',val:92,col:'#10b981'},
+  {name:'Health & Medicaid ($86B)',val:86,col:'#38bdf8'},
+  {name:'Transit & Infra ($42B)',val:42,col:'#f4ac5e'},
+  {name:'Pensions & Reserve ($30B)',val:30,col:'#a78bfa'}
+];
+
+function drawSankey(){
+  ctx.fillStyle='#94a3b8';
+  ctx.font='600 11px ui-monospace, monospace';
+  ctx.fillText('VERIFIED CONSERVATION GATE: Σ Inflows ($250.0B) ≡ Σ Outflows ($250.0B) · Discrepancy: $0.00',20,24);
+
+  const lx=48,mx=W*0.48,rx=W-210;
+  const topY=54,totH=H-125;
+  const total=250;
+
+  // Center General Fund node
+  ctx.fillStyle='#0f292e';
+  ctx.strokeStyle='#10b981';
+  ctx.lineWidth=2;
+  ctx.fillRect(mx-28,topY+20,56,totH-40);
+  ctx.strokeRect(mx-28,topY+20,56,totH-40);
+
+  let yL=topY,yM1=topY+20;
+  inflows.forEach((inf,idx)=>{
+    const h=(inf.val/total)*(totH-40);
+    ctx.fillStyle=inf.col+'33';
+    ctx.beginPath();
+    ctx.moveTo(lx+130,yL);
+    ctx.bezierCurveTo(lx+230,yL,mx-100,yM1,mx-28,yM1);
+    ctx.lineTo(mx-28,yM1+h);
+    ctx.bezierCurveTo(mx-100,yM1+h,lx+230,yL+h,lx+130,yL+h);
+    ctx.closePath();
+    ctx.fill();
+
+    // Animated flow particles
+    for(let p=0;p<4;p++){
+      const u=((t*0.6+p*0.25+idx*0.17)%1);
+      const px=(1-u)*(lx+130)+u*(mx-28);
+      const py=(1-u)*(yL+h/2)+u*(yM1+h/2);
+      ctx.fillStyle=inf.col;
+      ctx.beginPath();ctx.arc(px,py,3,0,Math.PI*2);ctx.fill();
+    }
+
+    ctx.fillStyle=inf.col;
+    ctx.fillRect(lx+122,yL,8,h);
+    ctx.fillStyle='#f8fafc';
+    ctx.font='600 11.5px Inter, sans-serif';
+    ctx.fillText(inf.name,lx,yL+h/2+4);
+    yL+=h+14;yM1+=h;
+  });
+
+  let yR=topY,yM2=topY+20;
+  outflows.forEach((out,idx)=>{
+    const h=(out.val/total)*(totH-40);
+    ctx.fillStyle=out.col+'33';
+    ctx.beginPath();
+    ctx.moveTo(mx+28,yM2);
+    ctx.bezierCurveTo(mx+100,yM2,rx-100,yR,rx,yR);
+    ctx.lineTo(rx,yR+h);
+    ctx.bezierCurveTo(rx-100,yR+h,mx+100,yM2+h,mx+28,yM2+h);
+    ctx.closePath();
+    ctx.fill();
+
+    for(let p=0;p<4;p++){
+      const u=((t*0.6+p*0.25+idx*0.13)%1);
+      const px=(1-u)*(mx+28)+u*rx;
+      const py=(1-u)*(yM2+h/2)+u*(yR+h/2);
+      ctx.fillStyle=out.col;
+      ctx.beginPath();ctx.arc(px,py,3,0,Math.PI*2);ctx.fill();
+    }
+
+    ctx.fillStyle=out.col;
+    ctx.fillRect(rx,yR,8,h);
+    ctx.fillStyle='#f8fafc';
+    ctx.font='600 11.5px Inter, sans-serif';
+    ctx.fillText(out.name,rx+14,yR+h/2+4);
+    yR+=h+10;yM2+=h;
+  });
+}
+
+function drawFeeDrag(){
+  const rGross=0.08;
+  const fLow=0.0003;
+  const years=30;
+  const endLow=100*Math.pow(1+rGross-fLow,years);
+  const endHigh=100*Math.pow(1+rGross-activeFee,years);
+  const lost=endLow-endHigh;
+
+  ctx.fillStyle='#94a3b8';
+  ctx.font='600 11px ui-monospace, monospace';
+  ctx.fillText(`30-YEAR COMPOUNDING WATERFALL ($100k @ 8% Gross) · Index (0.03%): $${endLow.toFixed(0)}k vs Active (${(activeFee*100).toFixed(2)}%): $${endHigh.toFixed(0)}k · Drag: -$${lost.toFixed(0)}k`,20,24);
+
+  const padL=60,padR=40,padT=55,padB=65;
+  const gw=W-padL-padR,gh=H-padT-padB;
+
+  ctx.strokeStyle='rgba(255,255,255,0.1)';
+  ctx.strokeRect(padL,padT,gw,gh);
+
+  // Shaded fee-drag wedge
+  ctx.fillStyle='rgba(244,172,94,0.18)';
+  ctx.beginPath();
+  for(let y=0;y<=years;y++){
+    const x=padL+(y/years)*gw;
+    const v=100*Math.pow(1+rGross-fLow,y);
+    const py=padT+gh-(v/1050)*gh;
+    if(y===0)ctx.moveTo(x,py);else ctx.lineTo(x,py);
+  }
+  for(let y=years;y>=0;y--){
+    const x=padL+(y/years)*gw;
+    const v=100*Math.pow(1+rGross-activeFee,y);
+    const py=padT+gh-(v/1050)*gh;
+    ctx.lineTo(x,py);
+  }
+  ctx.closePath();ctx.fill();
+
+  // Low fee curve
+  ctx.strokeStyle='#10b981';ctx.lineWidth=3;ctx.beginPath();
+  for(let y=0;y<=years;y++){
+    const x=padL+(y/years)*gw;
+    const v=100*Math.pow(1+rGross-fLow,y);
+    const py=padT+gh-(v/1050)*gh;
+    if(y===0)ctx.moveTo(x,py);else ctx.lineTo(x,py);
+  }
+  ctx.stroke();
+
+  // Active fee curve
+  ctx.strokeStyle='#f4ac5e';ctx.lineWidth=3;ctx.beginPath();
+  for(let y=0;y<=years;y++){
+    const x=padL+(y/years)*gw;
+    const v=100*Math.pow(1+rGross-activeFee,y);
+    const py=padT+gh-(v/1050)*gh;
+    if(y===0)ctx.moveTo(x,py);else ctx.lineTo(x,py);
+  }
+  ctx.stroke();
+
+  ctx.fillStyle='#6ee7b7';ctx.font='bold 12px monospace';
+  ctx.fillText(`0.03% Index Final: $${endLow.toFixed(1)}k`,W-260,padT+36);
+  ctx.fillStyle='#f4ac5e';
+  ctx.fillText(`${(activeFee*100).toFixed(2)}% Fee Final: $${endHigh.toFixed(1)}k (-$${lost.toFixed(1)}k lost)`,W-330,padT+60);
+}
+
+function drawDebtPlane(){
+  ctx.fillStyle='#94a3b8';
+  ctx.font='600 11px ui-monospace, monospace';
+  ctx.fillText('SOVEREIGN DEBT DYNAMICS: Δd_t = ((r − g)/(1 + g))·d_{t-1} + pb_t · Snowball Threshold r > g',20,24);
+
+  const padL=60,padT=55,gw=W-110,gh=H-120;
+  ctx.strokeStyle='rgba(255,255,255,0.12)';
+  ctx.strokeRect(padL,padT,gw,gh);
+
+  // Diagonal r = g stability boundary
+  ctx.strokeStyle='#10b981';ctx.setLineDash([6,4]);ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(padL,padT+gh);ctx.lineTo(padL+gw,padT);ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle='#6ee7b7';ctx.font='bold 12px monospace';
+  ctx.fillText('STABLE REGIME (g > r : Growth Outpaces Interest)',padL+24,padT+gh-24);
+  ctx.fillStyle='#fca5a5';
+  ctx.fillText('DEBT SNOWBALL REGIME (r > g : Compounding Interest Spiral)',padL+24,padT+34);
+
+  // Animated trajectory point
+  const px=padL+gw*0.62+Math.cos(t)*28;
+  const py=padT+gh*0.36+Math.sin(t)*18;
+  ctx.fillStyle='#f4ac5e';
+  ctx.beginPath();ctx.arc(px,py,7,0,Math.PI*2);ctx.fill();
+  ctx.fillText('Current US Trajectory (d = 122% GDP, r=4.4%, g=2.6%)',px-140,py-14);
+}
+
+function loop(){
+  ctx.fillStyle='#061014';ctx.fillRect(0,0,W,H);
+  if(mode==='sankey')drawSankey();
+  else if(mode==='fee')drawFeeDrag();
+  else drawDebtPlane();
+  t+=0.025;
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

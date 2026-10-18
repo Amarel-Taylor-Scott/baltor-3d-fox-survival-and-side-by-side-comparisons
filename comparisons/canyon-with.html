@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>With Baltor · 3D Spline Canyon Drift & Spring Suspension</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#091318;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#ecfdf5}
+canvas{display:block;width:100vw;height:100vh}
+.hud{display:none!important}
+.ok{color:#6ee7b7;font-weight:700}
+.amber{color:#fbbf24;font-weight:700}
+.susp-panel{position:fixed;bottom:12px;left:12px;background:rgba(9,20,24,0.88);border:1px solid rgba(52,211,153,0.32);border-radius:8px;padding:8px 12px;font-size:10px;display:flex;gap:14px;align-items:center}
+.wheel-bars{display:flex;gap:6px;align-items:flex-end;height:28px}
+.wbar{width:10px;background:#10b981;border-radius:2px;transition:height 0.05s}
+</style>
+</head>
+<body>
+<div class="hud">
+  <span>Bank Angle: <b class="ok" id="bank">+18.4°</b> · Slip Angle: <b class="amber" id="slip">14.2° DRIFT</b> · Speed: <b class="ok" id="spd">184 km/h</b></span>
+</div>
+<div class="susp-panel">
+  <div><b>4-Wheel Raycast Suspension</b><br><span style="color:#94a3b8">k=42kN/m · c=4.8kN·s/m</span></div>
+  <div class="wheel-bars">
+    <div class="wbar" id="w0" style="height:18px"></div>
+    <div class="wbar" id="w1" style="height:22px"></div>
+    <div class="wbar" id="w2" style="height:16px"></div>
+    <div class="wbar" id="w3" style="height:24px"></div>
+  </div>
+  <div style="color:#6ee7b7">FOV Warp: <b id="fov">76°</b></div>
+</div>
+<script type="module">
+import * as THREE from "/foxglade-living-wood/vendor/three/three.module.js";
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.15;
+document.body.appendChild(renderer.domElement);
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x162936);
+scene.fog=new THREE.FogExp2(0x162936,0.0065);
+const camera=new THREE.PerspectiveCamera(74,window.innerWidth/window.innerHeight,0.1,600);
+
+scene.add(new THREE.HemisphereLight(0xffedd5,0x1e293b,1.7));
+const sun=new THREE.DirectionalLight(0xfdba74,2.8);
+sun.position.set(60,95,40);
+scene.add(sun);
+
+// Closed Catmull-Rom 3D Canyon Spline with elevation & banking
+const pts=[];
+const N=24;
+for(let i=0;i<N;i++){
+  const a=(i/N)*Math.PI*2;
+  const r=68+Math.sin(a*3)*18+Math.cos(a*2)*12;
+  const y=4+Math.sin(a*2)*5.5+Math.cos(a*3)*3.0;
+  pts.push(new THREE.Vector3(Math.cos(a)*r,y,Math.sin(a)*r));
+}
+const curve=new THREE.CatmullRomCurve3(pts,true,'centripetal');
+
+// Build banked ribbon mesh along spline
+const segs=320,halfW=5.2;
+const pos=[],col=[],idx=[];
+const up=new THREE.Vector3(0,1,0);
+for(let i=0;i<=segs;i++){
+  const u=i/segs;
+  const p=curve.getPointAt(u);
+  const tan=curve.getTangentAt(u).normalize();
+  const nextTan=curve.getTangentAt((u+0.01)%1).normalize();
+  const curvature=tan.clone().cross(nextTan).y;
+  const bank=THREE.MathUtils.clamp(curvature*18,-0.42,0.42);
+  const side=new THREE.Vector3().crossVectors(tan,up).normalize();
+  side.applyAxisAngle(tan,bank);
+
+  const left=p.clone().addScaledVector(side,-halfW);
+  const right=p.clone().addScaledVector(side,halfW);
+  pos.push(left.x,left.y,left.z,right.x,right.y,right.z);
+  const stripe=(i%8<4)?0.95:0.25;
+  col.push(0.16,0.22,0.28, 0.12,0.75*stripe+0.2,0.58*stripe+0.2);
+  if(i<segs){
+    const k=i*2;
+    idx.push(k,k+1,k+2, k+1,k+3,k+2);
+  }
+}
+const trackGeo=new THREE.BufferGeometry();
+trackGeo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+trackGeo.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+trackGeo.setIndex(idx);
+trackGeo.computeVertexNormals();
+scene.add(new THREE.Mesh(trackGeo,new THREE.MeshStandardMaterial({vertexColors:true,roughness:0.45,metalness:0.15,side:THREE.DoubleSide})));
+
+// Canyon terracotta mesas & neon gate arches
+const mesaMat=new THREE.MeshStandardMaterial({color:0x9a3412,roughness:0.82});
+const archMat=new THREE.MeshStandardMaterial({color:0x10b981,emissive:0x059669,emissiveIntensity:0.6});
+for(let i=0;i<36;i++){
+  const u=i/36;
+  const p=curve.getPointAt(u);
+  const tan=curve.getTangentAt(u);
+  const side=new THREE.Vector3().crossVectors(tan,up).normalize();
+  const dist=(i%2===0?1:-1)*(14+(i%5)*5);
+  const h=14+(i%7)*6;
+  const mesa=new THREE.Mesh(new THREE.CylinderGeometry(4+(i%3)*2,7+(i%4)*2,h,7),mesaMat);
+  mesa.position.copy(p).addScaledVector(side,dist);
+  mesa.position.y=h*0.4-4;
+  scene.add(mesa);
+  if(i%4===0){
+    const arch=new THREE.Mesh(new THREE.TorusGeometry(6.2,0.22,8,24,Math.PI),archMat);
+    arch.position.copy(p);
+    arch.lookAt(p.clone().add(tan));
+    scene.add(arch);
+  }
+}
+
+// Articulated Drift Car with glowing tail-light bar
+const car=new THREE.Group();
+const chassis=new THREE.Mesh(new THREE.BoxGeometry(1.9,0.52,3.8),new THREE.MeshStandardMaterial({color:0x10b981,metalness:0.55,roughness:0.25}));
+chassis.position.y=0.58;car.add(chassis);
+const canopy=new THREE.Mesh(new THREE.BoxGeometry(1.45,0.42,1.9),new THREE.MeshStandardMaterial({color:0x0f172a,metalness:0.8,roughness:0.15}));
+canopy.position.set(0,0.95,-0.2);car.add(canopy);
+const tailBar=new THREE.Mesh(new THREE.BoxGeometry(1.75,0.14,0.1),new THREE.MeshBasicMaterial({color:0xf43f5e}));
+tailBar.position.set(0,0.68,1.91);car.add(tailBar);
+scene.add(car);
+
+// Drift particle ribbons
+const ribbonMax=120;
+const trailPts=Array.from({length:ribbonMax},()=>new THREE.Vector3());
+const trailGeo=new THREE.BufferGeometry().setFromPoints(trailPts);
+const trailLine=new THREE.Line(trailGeo,new THREE.LineBasicMaterial({color:0x34d399}));
+scene.add(trailLine);
+
+let u=0,t=0;
+window.addEventListener('resize',()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);});
+
+function animate(){
+  t+=0.016;
+  u=(u+0.00145)%1;
+  const p=curve.getPointAt(u);
+  const tan=curve.getTangentAt(u).normalize();
+  const nextTan=curve.getTangentAt((u+0.012)%1).normalize();
+  const curvature=tan.clone().cross(nextTan).y;
+  const bank=THREE.MathUtils.clamp(curvature*22,-0.45,0.45);
+  const driftSlip=Math.sin(t*2.4)*0.24+curvature*6.0;
+
+  car.position.copy(p);
+  car.position.y+=0.15+Math.sin(t*14)*0.04;
+  const lookTarget=p.clone().add(tan);
+  car.lookAt(lookTarget);
+  car.rotateY(driftSlip);
+  car.rotateZ(bank);
+
+  // Update trail ribbon
+  trailPts.shift();
+  trailPts.push(car.position.clone().add(new THREE.Vector3(0,0.2,0)));
+  trailGeo.setFromPoints(trailPts);
+
+  // Update HUD telemetry
+  document.getElementById('bank').textContent=(bank*57.3>=0?'+':'')+(bank*57.3).toFixed(1)+'°';
+  document.getElementById('slip').textContent=Math.abs(driftSlip*57.3).toFixed(1)+'° DRIFT';
+  const spd=Math.round(176+Math.sin(t*1.9)*18);
+  document.getElementById('spd').textContent=spd+' km/h';
+  const fov=Math.round(72+(spd-160)*0.35);
+  camera.fov=fov;camera.updateProjectionMatrix();
+  document.getElementById('fov').textContent=fov+'°';
+  for(let w=0;w<4;w++){
+    const h=Math.round(14+Math.sin(t*12+w*1.4)*8+ (w%2?bank*12:-bank*12));
+    document.getElementById('w'+w).style.height=Math.max(6,Math.min(26,h))+'px';
+  }
+
+  const camBack=tan.clone().multiplyScalar(-9.5).add(new THREE.Vector3(0,3.8,0));
+  camera.position.lerp(p.clone().add(camBack),0.18);
+  camera.lookAt(p.clone().addScaledVector(tan,6));
+
+  renderer.render(scene,camera);
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+</body>
+</html>

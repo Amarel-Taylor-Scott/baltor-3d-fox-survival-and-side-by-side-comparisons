@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Without Baltor · Crooked 4-Line Static Polygon Approximation</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#161920;color:#cbd5e1;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;user-select:none}
+canvas{display:block;width:100vw;height:100vh}
+.note{position:fixed;bottom:10px;left:10px;right:10px;background:rgba(15,17,22,0.88);border:1px solid rgba(248,113,113,0.35);border-radius:6px;padding:7px 11px;font-size:11px;color:#fca5a5}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="note">
+  ctx.lineTo(120,80); ctx.lineTo(310,140); · Hardcoded 4-segment polygon with un-closed gap (44px) and 48.2% L2 contour error.
+</div>
+<script>
+const c=document.getElementById('c'),ctx=c.getContext('2d');
+function draw(){
+  const W=c.width=window.innerWidth||800,H=c.height=window.innerHeight||500;
+  ctx.fillStyle='#161920';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;
+  for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  const cx=W*0.5,cy=H*0.46;
+  // Target ghost contour
+  ctx.save();
+  ctx.setLineDash([5,5]);
+  ctx.strokeStyle='rgba(148,163,184,0.28)';
+  ctx.lineWidth=1.5;
+  ctx.beginPath();
+  for(let i=0;i<=120;i++){
+    const a=(i/120)*Math.PI*2;
+    const r=110+35*Math.cos(3*a)+22*Math.sin(5*a);
+    const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  ctx.restore();
+
+  // Crooked 4-line static polygon with un-closed endpoint gap
+  const pts=[
+    [cx-115,cy-70],
+    [cx+125,cy-95],
+    [cx+105,cy+110],
+    [cx-130,cy+85],
+    [cx-95,cy-22]
+  ];
+  ctx.strokeStyle='#f87171';
+  ctx.lineWidth=3;
+  ctx.beginPath();
+  pts.forEach((p,i)=>i===0?ctx.moveTo(p[0],p[1]):ctx.lineTo(p[0],p[1]));
+  ctx.stroke();
+
+  pts.forEach(p=>{
+    ctx.fillStyle='#ef4444';
+    ctx.beginPath();ctx.arc(p[0],p[1],5,0,Math.PI*2);ctx.fill();
+  });
+
+  // Un-closed gap callout
+  ctx.strokeStyle='#fbbf24';
+  ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);ctx.lineTo(pts[4][0],pts[4][1]);ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#fca5a5';
+  ctx.font='bold 12px monospace';
+  ctx.fillText('UN-CLOSED ENDPOINT GAP (48.2% L2 ERROR)',cx-140,cy-125);
+}
+window.addEventListener('resize',draw);draw();
+</script>
+</body>
+</html>
